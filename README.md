@@ -4,6 +4,8 @@
 Include dahbug.php in your index.php or add it to the auto_prepend_file setting in php.ini.
 
 ### Reference
+* [dump](#dump)
+* [methods](#methods)
 
 #### dump
 Formats and prints debug information of data.
@@ -15,7 +17,7 @@ Formats and prints debug information of data.
 * `$maxDepth` [optional] The maximum recursion depth when printing arrays.
 
 #### methods
-This method prints the class methods of an object's or a class and its parents. Also prints the source code of a method if specified.
+This method prints the class methods of an object or a class and its parents. Also prints the source code of a method if specified.
 ```php
     void methods(mixed $object, string $method = null)
 ```
