@@ -233,49 +233,92 @@ class dahbug
     }
 
     /**
-     * Prints the methods of and object.
+     * Prints the methods of an object or a class, or the code of a method.
      * 
-     * @param object $object 
+     * @param mixed $object     The object or class to print.
+     * @param string $method    If you specify method, it will print the code from it.
      * @static
      * @access public
      * @return void
      */
-    static public function methods($object)
+    static public function methods($object, $method = null)
     {
-        if (!is_object($object)) {
-            self::outputln('No class methods found.');
+        if (is_object($object)) {
+            $className = get_class($object);
+        } else {
+            $className = $object;
+        }
+
+        if (!class_exists($className)) {
+            self::outputln("{$className} is not a declared class.");
 
             return;
         }
 
-        $label = "Class methods of";
-        $classes = self::_getClassMethods($object);
+        if ($method && method_exists($className, $method)) {
+            $refMethod = new ReflectionMethod($className, $method);
+            $string = self::_getMethodInfo($refMethod);
+        } else {
+            $string = '';
+            $label = "class";
+            $classes = self::_getClassMethods($className);
 
-        foreach ($classes as $class => $methods) {
-            $string .= " {$label} {$class}" . PHP_EOL;
-            foreach ($methods as $method) {
-                $ref = new ReflectionMethod($class, $method);
-                $params = self::_getMethodParams($ref);
-                $string .= "    {$method} ({$params})" . PHP_EOL;
+            foreach ($classes as $class => $methods) {
+                $string .= " {$label} {$class}" . PHP_EOL;
+                foreach ($methods as $method) {
+                    $ref = new ReflectionMethod($class, $method);
+                    $params = self::_getMethodParams($ref);
+                    $string .= "    {$method} ({$params})" . PHP_EOL;
+                }
+                $label = 'extends';
+                $string .= PHP_EOL;
             }
-            $label = 'inherited methods from';
-            $string .= PHP_EOL;
         }
 
         self::outputln($string);
     }
 
     /**
+     * Returns the code and the php doc from a ReflectionMethod.
+     * 
+     * @param ReflectionMethod $method 
+     * @static
+     * @access protected
+     * @return string $string
+     */
+    static protected function _getMethodInfo(ReflectionMethod $method)
+    {
+        $string = '';
+        $string .= "defined in class {$method->getDeclaringClass()->getName()}" . PHP_EOL;
+        $string .= "  file {$method->getFileName()}:{$method->getStartLine()}" . PHP_EOL;
+        $string .= "    {$method->getDocComment()}" . PHP_EOL;
+        $file = file($method->getFileName());
+        $i = 0;
+        $start = $method->getStartLine();
+
+        /**
+         * Search line by line backwards to find the word "function"
+         */
+        while (($start > 0) && (strpos($file[$start--], 'fuction') === null));
+
+        $end = $method->getEndLine();
+        for ($i = $start; $i < $end; $i++) {
+            $string .= $file[$i];
+        }
+
+        return $string;
+    }
+
+    /**
      * Generates an array with class names as keys and an array of methods as values.
      * 
-     * @param object $object 
+     * @param string $className 
      * @static
      * @access protected
      * @return array $classes
      */
-    static protected function _getClassMethods($object)
+    static protected function _getClassMethods($className)
     {
-        $className = get_class($object);
         $classes = array();
         if ($className) {
             $classes[$className] = get_class_methods($className);
@@ -297,7 +340,7 @@ class dahbug
      * @access protected
      * @return string $params
      */
-    static protected function _getMethodParams($ref)
+    static protected function _getMethodParams(ReflectionMethod $ref)
     {
         $params = array();
         foreach ($ref->getParameters() as $param) {
@@ -314,8 +357,13 @@ class dahbug
                     $declaration .= ' = null';
                 } else if (is_string($defaultValue)) {
                     $declaration .= " = '{$defaultValue}'";
-                } else if (is_int($defaultValue)) {
+                } else if (is_bool($defaultValue)) {
+                    $value = $defaultValue ? 'true' : 'false';
+                    $declaration .= " = {$value}";
+                } else if (is_scalar($defaultValue)) {
                     $declaration .= " = {$defaultValue}";
+                } else {
+                    $declaration = gettype($defaultValue);
                 }
             }
             $params[] = $declaration;
