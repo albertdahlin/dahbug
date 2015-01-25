@@ -15,8 +15,9 @@ Formats and prints debug information of data.
 * `$maxDepth` [optional] The maximum recursion depth when printing arrays.
 
 #### methods
-Prints the class methods of the object's class and its parents.
+This method prints the class methods of an object's or a class and its parents. Also prints the source code of a method if specified.
 ```php
-    void methods(object $object)
+    void methods(mixed $object, string $method = null)
 ```
 * `$object` The object you want to print the methods from.
+* `$method` [optional] If you pass a method name the source code and php doc of that method will be printed.
