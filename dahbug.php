@@ -388,10 +388,10 @@ class dahbug
         self::$_backtrace = debug_backtrace();
 
         if (!$maxDepth || !is_int($maxDepth)) {
-            $maxDepth = self::getData('dump/max_depth');
+            $maxDepth = self::getData('max_depth');
         }
 
-        if (self::getData('dump/print_filename')) {
+        if (self::getData('print_filename')) {
             self::_printFilename();
         }
 
@@ -427,7 +427,7 @@ class dahbug
                 if ($recursion < 1) {
                     foreach ((array)$var as $key => $value) {
                         $string .= PHP_EOL;
-                        $string .= str_repeat(' ', ($recursion + 1) * self::getData('dump/indent'));
+                        $string .= str_repeat(' ', ($recursion + 1) * self::getData('indent'));
                         $string .= self::_prepareLabel($key) . ' => ';
                         $string .= self::_formatVar($value, $recursion + 1, $maxDepth);
                     }
@@ -445,13 +445,13 @@ class dahbug
                 $length = mb_strlen($var);
                 $enc    = mb_detect_encoding($var);
 
-                if ($length > self::getData('dump/string_cap')) {
-                    $var = mb_substr($var, 0, self::getData('dump/string_cap'));
+                if ($length > self::getData('string_cap')) {
+                    $var = mb_substr($var, 0, self::getData('string_cap'));
                     $var .= '...';
                 }
 
                 $string = sprintf('(string:%d:%s) ', $length, $enc);
-                $string .= sprintf(self::getData('dump/string_format'), $var);
+                $string .= sprintf(self::getData('string_format'), $var);
 
                 return $string;
 
@@ -461,7 +461,7 @@ class dahbug
                 if ($recursion < $maxDepth) {
                     foreach ($var as $key => $value) {
                         $string .= PHP_EOL;
-                        $string .= str_repeat(' ', ($recursion + 1) * self::getData('dump/indent'));
+                        $string .= str_repeat(' ', ($recursion + 1) * self::getData('indent'));
                         $string .= self::_prepareLabel($key) . ' => ';
                         $string .= self::_formatVar($value, $recursion + 1, $maxDepth);
                     }
@@ -535,7 +535,7 @@ class dahbug
             }
         }
 
-        $label = sprintf(self::getData('dump/label_format'), $label);
+        $label = sprintf(self::getData('label_format'), $label);
 
         return $label;
     }

@@ -1,11 +1,9 @@
 {
     "log_file": "/var/log/dahbug.log",
-    "dump": {
-        "label_format": "[%s]",
-        "string_format": "'%s'",
-        "print_filename": true,
-        "string_cap": 50,
-        "indent": 4,
-        "max_depth": 3
-    }
+    "label_format": "[%s]",
+    "string_format": "'%s'",
+    "print_filename": true,
+    "string_cap": 50,
+    "indent": 4,
+    "max_depth": 3
 }
