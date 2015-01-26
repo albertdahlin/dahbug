@@ -2,7 +2,7 @@
 This script grew from the frustration when trying to log debug data with `var_dump()` or `print_r()`. If you have a large multidimensional array, or an object with circular references, those functions will just output to much data.
 To solve this I wrote this little script that writes debug data to a log file.
 
-### Installation & Configuration
+### 1. Installation & Configuration
 Include `dahbug.php` in your index.php or add it to the `auto_prepend_file` setting in your php.ini. The file declares one class, `dahbug` that works as wrapper for the dump methods.
 
 There are a few configuration options for the script. You will find them in the config.json file. 
@@ -20,7 +20,7 @@ If you wish to modify these settings, create a file called `local.json` and over
     max_depth:      The maximum number of recursions (levels) when printing arrays.
 ```
 
-### Usage
+### 2. Usage
 Just make a static call to the method you want to use:
 
 ```php
@@ -30,7 +30,17 @@ Just make a static call to the method you want to use:
 When you use any of the dump methods the output will be printed to the log file.
 I would recommed you to open a terminal and run `tail -f <logfile>` to see the output as the application is running..
 
-#### Example
+When you make a request to a script, eg. http://example.com/some/path the following will be printed to the log file:
+
+```
+192.168.1.87 example.com GET /some/path
+
+Request processing time: 6.46 ms   Memory Usage: 1 Mb
+```
+
+The debug output will be printed between those lines.
+
+### 3. Example
 
 I will use this code for the examples.
 
@@ -130,7 +140,7 @@ defined in class bar
 Request processing time: 6.46 ms   Memory Usage: 1 Mb
 
 ```
-### Function Reference
+### 4. Function Reference
 * [dump()](#dump) Dump variables and formated printing.
 * [methods()](#methods) Dumps class methods or method code.
 * [backtrace()](#backtrace) Prints a backtrace.
