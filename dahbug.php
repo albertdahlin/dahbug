@@ -255,6 +255,9 @@ class dahbug
             return;
         }
 
+        self::$_backtrace = debug_backtrace();
+        self::_printFilename();
+
         if ($method && method_exists($className, $method)) {
             $refMethod = new ReflectionMethod($className, $method);
             $string = self::_getMethodInfo($refMethod);
