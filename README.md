@@ -42,7 +42,7 @@ The debug output will be printed between those lines.
 
 ### 3. Example
 
-I will use this code for the examples.
+I will use this code for the examples in the function reference
 
 ```php
 class foo
@@ -87,59 +87,6 @@ $bar->setData(array(
 ));
 ```
 
-Adding `dahbug::dump($bar);` to the end of the example script will output:
-
-```
-192.168.1.87 test.dev GET /dahbug/example.php
-
- In file /var/www/dahbug/example.php:44
-  [$bar] = (object:1) bar
-    [*data] => (array:4) 
-        [some_string] => (string:11:ASCII) 'Foo Bar Baz'
-        [a_numer] => (int) 123
-        [an_array] => (array:2) 
-            [more] => (string:6:ASCII) 'String'
-            [data] => (int) 123
-        [an_object] => (object:0) stdClass
-
-Request processing time: 13.81 ms   Memory Usage: 1 Mb
-```
-
-Adding `dahbug::methods($bar);` to the end of the example script will output:
-
-```
-192.168.1.87 test.dev GET /dahbug/example.php
-
- In file /var/www/dahbug/example.php:44
- class bar
-    printData ()
-
- extends foo
-    setData ($data)
-    getData ()
-
-Request processing time: 3.40 ms   Memory Usage: 1 Mb
-
-```
-
-Adding `dahbug::methods($bar, 'printData');` to the end of the example script will output:
-
-```
-192.168.1.87 test.dev GET /dahbug/example.php
-
-defined in class bar
-  file /var/www/dahbug/example.php:20
-
-    public function printData()
-    {
-        if ($this->_canPrint()) {
-            print_r($this->data);
-        }
-    }
-
-Request processing time: 6.46 ms   Memory Usage: 1 Mb
-
-```
 ### 4. Function Reference
 * [dump()](#dump) Dump variables and formated printing.
 * [methods()](#methods) Dumps class methods or method code.
@@ -160,6 +107,26 @@ Strings will be capped to the length specified in config.json.
 * `$label` [optional] You can pass a string here to be used as label in your log.
 * `$maxDepth` [optional] The maximum recursion depth when printing arrays.
 
+###### Example:
+Adding `dahbug::dump($bar);` to the end of the example script will output:
+
+```
+192.168.1.87 test.dev GET /dahbug/example.php
+
+ In file /var/www/dahbug/example.php:44
+  [$bar] = (object:1) bar
+    [*data] => (array:4) 
+        [some_string] => (string:11:ASCII) 'Foo Bar Baz'
+        [a_numer] => (int) 123
+        [an_array] => (array:2) 
+            [more] => (string:6:ASCII) 'String'
+            [data] => (int) 123
+        [an_object] => (object:0) stdClass
+
+Request processing time: 13.81 ms   Memory Usage: 1 Mb
+
+```
+
 #### methods
 This method prints the class methods of an object or a class and its parents. Also prints the source code of a method if specified.
 
@@ -168,6 +135,44 @@ This method prints the class methods of an object or a class and its parents. Al
 ```
 * `$object` The object you want to print the methods from.
 * `$method` [optional] If you pass a method name the source code and php doc of that method will be printed.
+
+###### Example:
+Adding `dahbug::methods($bar);` to the end of the example script will output:
+
+```
+192.168.1.87 test.dev GET /dahbug/example.php
+
+ In file /var/www/dahbug/example.php:44
+ class bar
+    printData ()
+
+ extends foo
+    setData ($data)
+    getData ()
+
+Request processing time: 3.40 ms   Memory Usage: 1 Mb
+
+```
+As you can see, only the public methods are listed.
+
+Adding `dahbug::methods($bar, 'printData');` to the end of the example script will output:
+
+```
+192.168.1.87 test.dev GET /dahbug/example.php
+
+defined in class bar
+  file /var/www/dahbug/example.php:20
+
+    public function printData()
+    {
+        if ($this->_canPrint()) {
+            print_r($this->data);
+        }
+    }
+
+Request processing time: 6.46 ms   Memory Usage: 1 Mb
+
+```
 
 #### backtrace
 Prints a backtrace.
