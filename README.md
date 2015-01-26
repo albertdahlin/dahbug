@@ -40,7 +40,7 @@ Strings will be capped to the length specified in config.json.
 ```php
     mixed dump(mixed $var, string $label = null, int $maxDepth = null)
 ```
-* `$var` The variable to dump.
+* `$var` The variable to dump. This will also be the return value.
 * `$label` [optional] You can pass a string here to be used as label in your log.
 * `$maxDepth` [optional] The maximum recursion depth when printing arrays.
 
