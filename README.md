@@ -21,9 +21,115 @@ If you wish to modify these settings, create a file called `local.json` and over
 ```
 
 ### Usage
+Just make a static call to the method you want to use:
+
+```php
+    dahbug::dump($var);
+```
+
 When you use any of the dump methods the output will be printed to the log file.
 I would recommed you to open a terminal and run `tail -f <logfile>` to see the output as the application is running..
 
+#### Example
+
+I will use this code for the examples.
+
+```php
+class foo
+{
+    protected $data;
+
+    public function setData($data)
+    {
+        $this->data = $data;
+    }
+
+    public function getData()
+    {
+        return $this->data;
+    }
+}
+
+class bar extends foo
+{
+    public function printData()
+    {
+        if ($this->_canPrint()) {
+            print_r($this->data);
+        }
+    }
+
+    protected function _canPrint()
+    {
+        return !empty($this->data);
+    }
+}
+
+$bar = new bar;
+$bar->setData(array(
+    'some_string' => 'Foo Bar Baz',
+    'a_numer' => 123,
+    'an_array' => array(
+        'more' => 'String',
+        'data' => 123
+    ),
+    'an_object' => new stdClass()
+));
+```
+
+Adding `dahbug::dump($bar);` to the end of the example script will output:
+
+```
+192.168.1.87 test.dev GET /dahbug/example.php
+
+ In file /var/www/dahbug/example.php:44
+  [$bar] = (object:1) bar
+    [*data] => (array:4) 
+        [some_string] => (string:11:ASCII) 'Foo Bar Baz'
+        [a_numer] => (int) 123
+        [an_array] => (array:2) 
+            [more] => (string:6:ASCII) 'String'
+            [data] => (int) 123
+        [an_object] => (object:0) stdClass
+
+Request processing time: 13.81 ms   Memory Usage: 1 Mb
+```
+
+Adding `dahbug::methods($bar);` to the end of the example script will output:
+
+```
+192.168.1.87 test.dev GET /dahbug/example.php
+
+ In file /var/www/dahbug/example.php:44
+ class bar
+    printData ()
+
+ extends foo
+    setData ($data)
+    getData ()
+
+Request processing time: 3.40 ms   Memory Usage: 1 Mb
+
+```
+
+Adding `dahbug::methods($bar, 'printData');` to the end of the example script will output:
+
+```
+192.168.1.87 test.dev GET /dahbug/example.php
+
+defined in class bar
+  file /var/www/dahbug/example.php:20
+
+    public function printData()
+    {
+        if ($this->_canPrint()) {
+            print_r($this->data);
+        }
+    }
+
+Request processing time: 6.46 ms   Memory Usage: 1 Mb
+
+```
 ### Function Reference
 * [dump()](#dump) Dump variables and formated printing.
 * [methods()](#methods) Dumps class methods or method code.
