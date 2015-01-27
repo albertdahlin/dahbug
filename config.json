@@ -4,6 +4,8 @@
     "string_format": "'%s'",
     "print_filename": true,
     "string_cap": 50,
+    "line_endings": "LF",
+    "output_encoding": "UTF-8",
     "indent": 4,
     "max_depth": 3
 }
