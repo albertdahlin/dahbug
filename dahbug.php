@@ -49,11 +49,19 @@ class dahbug
     static protected $_backtrace;
 
     /**
+     * Holds last printed filename.
+     * 
+     * @var string
+     * @access protected
+     */
+    static protected $_lastFilename;
+    /**
      * Initializes debug. Reads two config files, config.json and local.json.
      * 
      * @access public
      * @return void
      */
+
     static public function init()
     {
         self::setData('root', dirname(__file__));
@@ -398,7 +406,7 @@ class dahbug
             self::_printFilename();
         }
 
-        $label = self::_prepareLabel($label);
+        $label = self::_prepareLabel($label, true);
         $string = self::_formatVar($var, 0, $maxDepth);
         $string .= PHP_EOL;
         self::outputln('  ' . $label . ' = ' . $string);
@@ -506,12 +514,17 @@ class dahbug
     static protected function _printFilename()
     {
         $backtrace = self::$_backtrace;
-        $string = ' In file ';
-        $string .= $backtrace[0]['file'];
-        $string .= ':';
-        $string .= $backtrace[0]['line'];
+        $filename = $backtrace[0]['file'];
 
-        self::outputln($string);
+        if ($filename != self::$_lastFilename) {
+            $string = ' In file ';
+            $string .= $backtrace[0]['file'];
+            $string .= DAHBUG_EOL;
+            $string .= DAHBUG_EOL;
+
+            self::$_lastFilename = $filename;
+            self::_write($string);
+        }
     }
 
     /**
@@ -523,10 +536,11 @@ class dahbug
      * @access protected
      * @return string $label
      */
-    static protected function _prepareLabel($label)
+    static protected function _prepareLabel($label, $line = false)
     {
+        $backtrace = self::$_backtrace;
+
         if ($label === null) {
-            $backtrace = self::$_backtrace;
             $file  = file($backtrace[0]['file']);
             $label = $file[$backtrace[0]['line']-1];
             $label = trim($label);
@@ -539,6 +553,10 @@ class dahbug
         }
 
         $label = sprintf(self::getData('label_format'), $label);
+
+        if ($line && self::getData('print_filename')) {
+            $label = ' ' . str_pad($backtrace[0]['line'], 5) . $label;
+        }
 
         return $label;
     }
