@@ -76,6 +76,25 @@ class dahbug
         if (!self::$_logFile) {
             throw new Exception("Can not open log file for writing {$logFile}");
         }
+        
+        $eol = strtoupper(self::getData('line_endings'));
+        switch ($eol) {
+            case 'LF':
+                define('DAHBUG_EOL', "\n");
+                break;
+
+            case 'CR':
+                define('DAHBUG_EOL', "\r");
+                break;
+
+            case 'CRLF':
+                define('DAHBUG_EOL', "\r\n");
+                break;
+
+            default:
+                throw new Exception("Unknown line ending: {$eol}");
+                break;
+        }
 
         self::getInstance();
     }
@@ -234,10 +253,10 @@ class dahbug
                 $data['function'],
                 implode(', ', $args)
             );
-            $string .= PHP_EOL;
+            $string .= DAHBUG_EOL;
         }
 
-        self::outputln($string);
+        self::_write($string);
     }
 
     /**
@@ -258,7 +277,7 @@ class dahbug
         }
 
         if (!class_exists($className)) {
-            self::outputln("{$className} is not a declared class.");
+            self::_write("{$className} is not a declared class.");
 
             return;
         }
@@ -275,18 +294,18 @@ class dahbug
             $classes = self::_getClassMethods($className);
 
             foreach ($classes as $class => $methods) {
-                $string .= " {$label} {$class}" . PHP_EOL;
+                $string .= " {$label} {$class}" . DAHBUG_EOL;
                 foreach ($methods as $method) {
                     $ref = new ReflectionMethod($class, $method);
                     $params = self::_getMethodParams($ref);
-                    $string .= "    {$method} ({$params})" . PHP_EOL;
+                    $string .= "    {$method} ({$params})" . DAHBUG_EOL;
                 }
                 $label = 'extends';
-                $string .= PHP_EOL;
+                $string .= DAHBUG_EOL;
             }
         }
 
-        self::outputln($string);
+        self::_write($string);
     }
 
     /**
@@ -300,9 +319,9 @@ class dahbug
     static protected function _getMethodInfo(ReflectionMethod $method)
     {
         $string = '';
-        $string .= "defined in class {$method->getDeclaringClass()->getName()}" . PHP_EOL;
-        $string .= "  file {$method->getFileName()}:{$method->getStartLine()}" . PHP_EOL;
-        $string .= "    {$method->getDocComment()}" . PHP_EOL;
+        $string .= "defined in class {$method->getDeclaringClass()->getName()}" . DAHBUG_EOL;
+        $string .= "  file {$method->getFileName()}:{$method->getStartLine()}" . DAHBUG_EOL;
+        $string .= "    {$method->getDocComment()}" . DAHBUG_EOL;
         $file = file($method->getFileName());
         $i = 0;
         $start = $method->getStartLine();
@@ -408,8 +427,8 @@ class dahbug
 
         $label = self::_prepareLabel($label, true);
         $string = self::_formatVar($var, 0, $maxDepth);
-        $string .= PHP_EOL;
-        self::outputln('  ' . $label . ' = ' . $string);
+        $string .= DAHBUG_EOL;
+        self::_write($label . ' = ' . $string);
 
         return $var;
     }
@@ -437,7 +456,7 @@ class dahbug
                 $string = sprintf('(object:%d) ', count((array)$var)) . get_class($var);
                 if ($recursion < 1) {
                     foreach ((array)$var as $key => $value) {
-                        $string .= PHP_EOL;
+                        $string .= DAHBUG_EOL;
                         $string .= str_repeat(' ', ($recursion + 1) * self::getData('indent'));
                         $string .= self::_prepareLabel($key) . ' => ';
                         $string .= self::_formatVar($value, $recursion + 1, $maxDepth);
@@ -453,13 +472,17 @@ class dahbug
                 return $string;
 
             case 'string':
-                $length = mb_strlen($var);
-                $enc    = mb_detect_encoding($var);
+                $enc        = mb_detect_encoding($var, mb_list_encodings(), false);
+                $length     = mb_strlen($var, $enc);
+                $stringCap  = self::getData('string_cap');
+                $outEnc     = self::getData('output_encoding');
 
-                if ($length > self::getData('string_cap')) {
-                    $var = mb_substr($var, 0, self::getData('string_cap'));
+                if ($stringCap && $length > $stringCap) {
+                    $var = mb_substr($var, 0, $stringCap, $enc);
                     $var .= '...';
                 }
+                $var = str_replace(array("\n", "\r"), array('\n', '\r'), $var);
+                $var = mb_convert_encoding($var, $outEnc, $enc);
 
                 $string = sprintf('(string:%d:%s) ', $length, $enc);
                 $string .= sprintf(self::getData('string_format'), $var);
@@ -471,7 +494,7 @@ class dahbug
 
                 if ($recursion < $maxDepth) {
                     foreach ($var as $key => $value) {
-                        $string .= PHP_EOL;
+                        $string .= DAHBUG_EOL;
                         $string .= str_repeat(' ', ($recursion + 1) * self::getData('indent'));
                         $string .= self::_prepareLabel($key) . ' => ';
                         $string .= self::_formatVar($value, $recursion + 1, $maxDepth);
@@ -594,12 +617,34 @@ class dahbug
      * @access public
      * @return void
      */
-    static public function outputln($var)
+    static public function write($var)
     {
-        if (is_object($var)) {
+        $lineEndings        = strtoupper(self::getData('line_endings'));
+        $outputEncoding     = self::getData('output_encoding');
+        $enc                = mb_detect_encoding($var, mb_list_encodings(), false);
+
+        if (is_object($var) && method_exists($var, '__toString')) {
             $var = $var->__toString();
         }
-        self::_write($var.PHP_EOL);
+
+        switch ($lineEndings) {
+            case 'LF':
+                $var = str_replace(array("\r\n", "\r"), "\n", $var);
+                break;
+            case 'CR':
+                $var = str_replace(array("\r\n", "\n"), "\r", $var);
+                break;
+            case 'CRLF':
+                $var = str_replace(array("\r\n", "\n", "\r"), "\r\n", $var);
+                break;
+        }
+
+        if ($enc != $outputEncoding) {
+            $var = mb_convert_encoding($var, $enc);
+        }
+
+        
+        self::_write($var . DAHBUG_EOL);
     }
 
     /**
@@ -643,7 +688,7 @@ class dahbug
             $string = $this->_getCliDumpHeader();
         }
 
-        self::outputln($string . PHP_EOL);
+        self::_write($string . DAHBUG_EOL . DAHBUG_EOL);
         $this->_requestTime = microtime(true);
     }
 
@@ -697,10 +742,12 @@ class dahbug
     protected function _getRequestFooter()
     {
         $time = microtime(true) - $this->_requestTime;
-        $string = sprintf('Request processing time: %s   Memory Usage: %d Mb',
+        $string = DAHBUG_EOL;
+        $string .= sprintf('Request processing time: %s   Memory Usage: %d Mb',
             self::_formatTime($time),
             memory_get_peak_usage(true) / (1024 * 1024)
         );
+        $string .= DAHBUG_EOL;
 
         return $string;
     }
@@ -714,7 +761,7 @@ class dahbug
     public function __destruct()
     {
         $string = $this->_getRequestFooter();
-        self::outputln($string . PHP_EOL);
+        self::_write($string . DAHBUG_EOL);
 
         if (self::$_logFile) {
             fclose(self::$_logFile);
