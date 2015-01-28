@@ -352,8 +352,10 @@ class dahbug
         $classes = array();
         if ($className) {
             $classes[$className] = get_class_methods($className);
+            asort($classes[$className]);
             while ($parentClass = get_parent_class($className)) {
                 $classes[$parentClass] = get_class_methods($parentClass);
+                asort($classes[$parentClass]);
                 $classes[$className] = array_diff($classes[$className], $classes[$parentClass]);
                 $className = $parentClass;
             }
