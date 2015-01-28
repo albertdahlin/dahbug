@@ -492,6 +492,75 @@ class dahbug
     }
 
     /**
+     * Prints a hex dump of a string.
+     * 
+     * @param string $bin 
+     * @static
+     * @access public
+     * @return void
+     */
+    static public function hex($bin)
+    {
+        $string = DAHBUG_EOL;
+        $header = '';
+        $length = strlen($bin);
+        $i = $r = 0;
+        $cols = 16;
+        $rows = $length / $cols;
+
+        $string .= "Hex dump of {$length} byte:" . DAHBUG_EOL;
+        $string .= DAHBUG_EOL;
+        for ($i = 0; $i < $cols; $i++) {
+            $header .= '0' . dechex($i);
+            if ($i % 4 === 3) {
+                $header .= '  ';
+            } else {
+                $header .= ' ';
+            }
+        }
+
+        $string .= str_repeat(' ', 10) . $header . DAHBUG_EOL;
+
+        for ($r = 0; $r < $rows; $r++) {
+            $addr = dechex($r * $cols);
+            $hex = '';
+            $ascii = '';
+            for ($i = 0; $i < $cols; $i++) {
+                $offset = $r * $cols + $i;
+                if ($offset >= $length) {
+                    break;
+                }
+                $hex .= dechex(ord($bin[$offset]));
+                if ($i % 4 === 3) {
+                    $hex .= '  ';
+                } else {
+                    $hex .= ' ';
+                }
+            }
+            for ($i = 0; $i < $cols; $i++) {
+                $offset = $r * $cols + $i;
+                if ($offset >= $length) {
+                    break;
+                }
+                $ord = ord($bin[$offset]);
+                if (($ord < 126) && ($ord > 31)) { 
+                    $ascii .= $bin[$offset];
+                } else {
+                    $ascii .= '.';
+                }
+                if ($i % 4 === 3) {
+                    $ascii .= ' ';
+                }
+            }
+            $string .= str_pad($addr, 8, '0', STR_PAD_LEFT) . '  ';
+            $string .= str_pad($hex, $cols * 3 + $cols / 4);
+            $string .= $ascii . DAHBUG_EOL;
+        }
+
+        self::_write($string);
+    }
+
+    /**
      * Dump function
      * 
      * @param mixed $var        The variable to dump.
