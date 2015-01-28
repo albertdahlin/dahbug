@@ -256,6 +256,16 @@ class dahbug
                         $arg ? 'true' : 'false',
                         'dump_bool'
                     );
+                } else if (is_null($arg)) {
+                    $args[] = self::_colorize(
+                        'null',
+                        'dump_null'
+                    );
+                } else if (is_float($arg)) {
+                    $args[] = self::_colorize(
+                        $arg,
+                        'dump_float'
+                    );
                 } else {
                     $args[] = self::_colorize(
                         gettype($arg),
