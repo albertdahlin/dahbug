@@ -8,6 +8,8 @@ Include `dahbug.php` in your index.php or add it to the `auto_prepend_file` sett
 There are a few configuration options for the script. You will find them in the config.json file. 
 If you wish to modify these settings, create a file called `local.json` and override them there.
 
+##### Configuration
+
 ```
     log_file:       This is the file where the output will be printed. 
                     Remember that it has to be writable by the web server.
@@ -23,7 +25,14 @@ If you wish to modify these settings, create a file called `local.json` and over
                     "ASCII" etc... Accepts all values that are listed by `mb_list_encodings()`
     indent:         When printing arrays, each level will be indented this number of spaces.
     max_depth:      The maximum number of recursions (levels) when printing arrays.
+    use_colors:     Set to true if you want to colorize terminal output.
+    theme:          Select color theme. Themes are saved in <theme name>.theme files.
+    color:          Terminal color values. Don't touch...
 ```
+
+##### Color themes
+You can create your own color themes. Just copy `default.theme` and change the colors.
+Valid color values are found in the config.json file.
 
 ### 2. Usage
 Just make a static call to the method you want to use:
