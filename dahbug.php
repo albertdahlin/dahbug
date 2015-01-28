@@ -96,6 +96,9 @@ class dahbug
                 break;
         }
 
+        $theme = self::getData('theme');
+        self::_loadConfigFile($theme . '.theme');
+
         self::getInstance();
     }
 
@@ -226,31 +229,60 @@ class dahbug
     static public function backtrace()
     {
         $backtrace = debug_backtrace();
-        $string = '';
+        $string = DAHBUG_EOL;
+        $string .= "Printing callstack:" . DAHBUG_EOL;
+
         $root = $_SERVER['DOCUMENT_ROOT'];
         foreach ($backtrace as $row => $data) {
-            $file = substr($data['file'], strlen($root) + 1);
+            $file = substr($data['file'], strlen($root));
             $args = array();
             foreach ($data['args'] as $arg) {
                 if (is_string($arg)) {
                     if (strlen($arg) > 20) {
                         $arg = '...' . substr($arg, -20);
                     }
+                    $arg = self::_colorize(
+                        $arg,
+                        'dump_string'
+                    );
                     $args[] = "'{$arg}'";
-                } else if (is_scalar($arg)) {
-                    $args[] = "{$arg}";
+                } else if (is_int($arg)) {
+                    $args[] = self::_colorize(
+                        $arg,
+                        'dump_int'
+                    );
+                } else if (is_bool($arg)) {
+                    $args[] = self::_colorize(
+                        $arg ? 'true' : 'false',
+                        'dump_bool'
+                    );
                 } else {
-                    $args[] = gettype($arg);
+                    $args[] = self::_colorize(
+                        gettype($arg),
+                        'dump_value'
+                    );
                 }
             }
+            $class = '';
+            if (isset($data['class'])) {
+                $class = self::_colorize(
+                    isset($data['object']) ? get_class($data['object']) : $data['class'],
+                    'methods_class'
+                );
+            }
+
+            $function = self::_colorize(
+                $data['function'],
+                'methods_function'
+            );
             $string .= sprintf(
                 '#%d %s:(%d) %s%s%s(%s)',
                 $row,
                 $file,
                 $data['line'],
-                isset($data['object']) ? get_class($data['object']) : '',
+                $class,
                 isset($data['type']) ? $data['type'] : '',
-                $data['function'],
+                $function,
                 implode(', ', $args)
             );
             $string .= DAHBUG_EOL;
@@ -285,20 +317,35 @@ class dahbug
         self::$_backtrace = debug_backtrace();
         self::_printFilename();
 
+        $string = DAHBUG_EOL;
+        if (self::getData('print_filename')) {
+            $string .= str_pad(self::$_backtrace[0]['line'], 4);
+        }
+
         if ($method && method_exists($className, $method)) {
             $refMethod = new ReflectionMethod($className, $method);
-            $string = self::_getMethodInfo($refMethod);
+            $string .= self::_getMethodInfo($refMethod);
         } else {
-            $string = '';
             $label = "class";
             $classes = self::_getClassMethods($className);
+            $string .= "Methods of {$className}" . DAHBUG_EOL;
 
             foreach ($classes as $class => $methods) {
-                $string .= " {$label} {$class}" . DAHBUG_EOL;
+                $string .= " {$label} ";
+                $string .= self::_colorize(
+                    $class,
+                    'methods_class'
+                );
+                $string .= DAHBUG_EOL;
                 foreach ($methods as $method) {
                     $ref = new ReflectionMethod($class, $method);
                     $params = self::_getMethodParams($ref);
-                    $string .= "    {$method} ({$params})" . DAHBUG_EOL;
+                    $string .= '    ';
+                    $string .= self::_colorize(
+                        $method,
+                        'methods_function'
+                    );
+                    $string .= "({$params})" . DAHBUG_EOL;
                 }
                 $label = 'extends';
                 $string .= DAHBUG_EOL;
@@ -381,19 +428,48 @@ class dahbug
                 $declaration .= '&';
             }
             $declaration .= '$' . $param->getName();
+            $declaration = self::_colorize(
+                $declaration,
+                'methods_param'
+            );
             if ($param->isOptional()) {
                 $defaultValue = $param->getDefaultValue();
                 if (is_array($defaultValue)) {
-                    $declaration .= ' = array()';
-                } else if (is_null($defaultValue)) {
-                    $declaration .= ' = null';
-                } else if (is_string($defaultValue)) {
-                    $declaration .= " = '{$defaultValue}'";
-                } else if (is_bool($defaultValue)) {
-                    $value = $defaultValue ? 'true' : 'false';
+                    $value = self::_colorize(
+                        'array()',
+                        'dump_array'
+                    );
                     $declaration .= " = {$value}";
-                } else if (is_scalar($defaultValue)) {
-                    $declaration .= " = {$defaultValue}";
+                } else if (is_null($defaultValue)) {
+                    $value = self::_colorize(
+                        'null',
+                        'dump_null'
+                    );
+                    $declaration .= " = {$value}";
+                } else if (is_string($defaultValue)) {
+                    $value = self::_colorize(
+                        $defaultValue,
+                        'dump_string'
+                    );
+                    $declaration .= " = '{$value}'";
+                } else if (is_bool($defaultValue)) {
+                    $value = self::_colorize(
+                        $defaultValue ? 'true' : 'false',
+                        'dump_bool'
+                    );
+                    $declaration .= " = {$value}";
+                } else if (is_int($defaultValue)) {
+                    $value = self::_colorize(
+                        $defaultValue,
+                        'dump_int'
+                    );
+                    $declaration .= " = {$value}";
+                } else if (is_float($defaultValue)) {
+                    $value = self::_colorize(
+                        $defaultValue,
+                        'dump_float'
+                    );
+                    $declaration .= " = {$value}";
                 } else {
                     $declaration = gettype($defaultValue);
                 }
@@ -455,10 +531,14 @@ class dahbug
 
         switch ($type) {
             case 'object':
-                $string = sprintf('(object:%d) ', count((array)$var)) . get_class($var);
+                $string = sprintf('(object:%d) ', count((array)$var));
+                $string .= self::_colorize(get_class($var), 'dump_value');
                 if ($recursion < 1) {
                     foreach ((array)$var as $key => $value) {
                         $string .= DAHBUG_EOL;
+                        if (self::getData('print_filename')) {
+                            $string .= '  ';
+                        }
                         $string .= str_repeat(' ', ($recursion + 1) * self::getData('indent'));
                         $string .= self::_prepareLabel($key) . ' => ';
                         $string .= self::_formatVar($value, $recursion + 1, $maxDepth);
@@ -469,7 +549,10 @@ class dahbug
 
             case 'boolean':
                 $string = '(boolean) ';
-                $string .= $var ? 'TRUE' : 'FALSE';
+                $string .= self::_colorize(
+                    $var ? 'TRUE' : 'FALSE',
+                    'dump_bool'
+                );
 
                 return $string;
 
@@ -485,6 +568,10 @@ class dahbug
                 }
                 $var = str_replace(array("\n", "\r"), array('\n', '\r'), $var);
                 $var = mb_convert_encoding($var, $outEnc, $enc);
+                $var = self::_colorize(
+                    $var,
+                    'dump_string'
+                );
 
                 $string = sprintf('(string:%d:%s) ', $length, $enc);
                 $string .= sprintf(self::getData('string_format'), $var);
@@ -492,11 +579,17 @@ class dahbug
                 return $string;
 
             case 'array':
-                $string = sprintf('(array:%d) ', count($var));
+                $string = self::_colorize(
+                    $string = sprintf('(array:%d) ', count($var)),
+                    'dump_array'
+                );
 
                 if ($recursion < $maxDepth) {
                     foreach ($var as $key => $value) {
                         $string .= DAHBUG_EOL;
+                        if (self::getData('print_filename')) {
+                            $string .= '  ';
+                        }
                         $string .= str_repeat(' ', ($recursion + 1) * self::getData('indent'));
                         $string .= self::_prepareLabel($key) . ' => ';
                         $string .= self::_formatVar($value, $recursion + 1, $maxDepth);
@@ -506,22 +599,45 @@ class dahbug
                 return $string;
 
             case 'NULL':
-                return '(NULL)';
+                $string = self::_colorize(
+                    '(NULL)',
+                    'dump_null'
+                );
+                return $string;
 
             case 'integer':
-                return "(int) {$var}";
+                $string = self::_colorize(
+                    $var,
+                    'dump_int'
+                );
+
+                return "(int) {$string}";
 
             case 'double':
-                return "(float) {$var}";
+                $string = self::_colorize(
+                    $var,
+                    'dump_float'
+                );
+
+                return "(float) {$string}";
 
             case 'resource':
-                return '(resource) ' . get_resource_type($var);
+                $string = self::_colorize(
+                    get_resource_type($var),
+                    'dump_value'
+                );
+
+                return '(resource) ' . $string;
 
             case 'callable':
                 $name = '';
                 is_callable($var, false, $name);
+                $string = self::_colorize(
+                    $name,
+                    'dump_value'
+                );
 
-                return '(callable) ' . $name;
+                return '(callable) ' . $string;
 
             default:
                 return 'Unknown Type';
@@ -542,7 +658,7 @@ class dahbug
         $filename = $backtrace[0]['file'];
 
         if ($filename != self::$_lastFilename) {
-            $string = ' In file ';
+            $string = 'In file ';
             $string .= $backtrace[0]['file'];
             $string .= DAHBUG_EOL;
             $string .= DAHBUG_EOL;
@@ -577,10 +693,14 @@ class dahbug
             }
         }
 
+        $label = self::_colorize(
+            $label,
+            $line ? 'label' : 'key'
+        );
         $label = sprintf(self::getData('label_format'), $label);
 
         if ($line && self::getData('print_filename')) {
-            $label = ' ' . str_pad($backtrace[0]['line'], 5) . $label;
+            $label = str_pad($backtrace[0]['line'], 4) . $label;
         }
 
         return $label;
@@ -658,6 +778,35 @@ class dahbug
     }
 
     /**
+     * Adds terminal escape codes to colorize a string.
+     * 
+     * @param string $string 
+     * @param string $color 
+     * @static
+     * @access protected
+     * @return string
+     */
+    static protected function _colorize($string, $color = null)
+    {
+        if (!self::getData('use_colors')) {
+            return $string;
+        }
+
+        $colorNumber = self::getData('color/' . $color);
+        if (!$colorNumber) {
+            $color = self::getData('theme_colors/' . $color);
+            $colorNumber = self::getData('color/' . $color);
+        }
+        if (!$colorNumber) {
+            return $string;
+        }
+
+        $string = "\033[{$colorNumber}m" . $string . "\033[0m";
+
+        return $string;
+    }
+
+    /**
      * Writes a string to a stream opened with fopen.
      * 
      * @param string $string
@@ -697,10 +846,12 @@ class dahbug
         } else {
             $string = $this->_getCliDumpHeader();
         }
+        $string = self::_colorize($string, 'header');
 
         self::_write($string . DAHBUG_EOL . DAHBUG_EOL);
         $this->_requestTime = microtime(true);
     }
+
 
     /**
      * Returns a string containing log header information to print when the script
@@ -757,6 +908,9 @@ class dahbug
             self::_formatTime($time),
             memory_get_peak_usage(true) / (1024 * 1024)
         );
+
+        $string = self::_colorize($string, 'footer');
+        $string .= DAHBUG_EOL;
         $string .= DAHBUG_EOL;
 
         return $string;

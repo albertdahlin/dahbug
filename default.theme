@@ -1,0 +1,18 @@
+{
+    "theme_colors": {
+        "header": "light_green",
+        "footer": "green",
+        "label": "light_cyan",
+        "key": "cyan",
+        "dump_value": "white",
+        "dump_int": "light_purple",
+        "dump_string": "light_green",
+        "dump_null": "red",
+        "dump_bool": "light_red",
+        "dump_array": "blue",
+        "dump_float": "purple",
+        "methods_class": "white",
+        "methods_function": "light_cyan",
+        "methods_param": "light_blue"
+    }
+}
