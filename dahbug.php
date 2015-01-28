@@ -625,6 +625,7 @@ class dahbug
         $lineEndings        = strtoupper(self::getData('line_endings'));
         $outputEncoding     = self::getData('output_encoding');
         $encodings          = mb_list_encodings();
+        $outEnc             = self::getData('output_encoding');
 
         if ($encoding && in_array($encoding, $encodings)) {
             $enc = $encoding;
@@ -649,7 +650,7 @@ class dahbug
         }
 
         if ($enc != $outputEncoding) {
-            $var = mb_convert_encoding($var, $enc);
+            $var = mb_convert_encoding($var, $outEnc, $enc);
         }
 
         
