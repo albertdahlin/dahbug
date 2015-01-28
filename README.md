@@ -106,6 +106,7 @@ $bar->setData(array(
 * [methods()](#methods) Dumps class methods or method code.
 * [backtrace()](#backtrace) Prints a backtrace.
 * [write()](#write) Outputs text.
+* [hex()](#hex) Prints a hex dump.
 
 #### dump
 Formats and prints debug information of data. 
@@ -203,3 +204,11 @@ Prints a string to the log without formating the text.
 ```
 * `$var` The variable to print. If an object is passed, the __toString() method will be called to generate the output.
 * `$encoding` Force encoding of output to this encoding.
+
+#### hex
+Prints a hex dump of a binary string.
+
+```php
+    void hex(string $bin)
+```
+* `$bin` The binary string you want to dump.
