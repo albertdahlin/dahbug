@@ -190,6 +190,7 @@ Prints a backtrace.
 Prints a string to the log without formating the text.
 
 ```php
-    void write(mixed $var)
+    void write(mixed $var, string $encoding = null)
 ```
 * `$var` The variable to print. If an object is passed, the __toString() method will be called to generate the output.
+* `$encoding` Force encoding of output to this encoding.

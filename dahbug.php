@@ -614,16 +614,23 @@ class dahbug
      * Prints a string to the log file without formatting. If an object is passed
      * the __toString function will be called and the result used for printing.
      * 
-     * @param mixed $var 
+     * @param mixed  $var 
+     * @param string $encoding 
      * @static
      * @access public
      * @return void
      */
-    static public function write($var)
+    static public function write($var, $encoding = null)
     {
         $lineEndings        = strtoupper(self::getData('line_endings'));
         $outputEncoding     = self::getData('output_encoding');
-        $enc                = mb_detect_encoding($var, mb_list_encodings(), false);
+        $encodings          = mb_list_encodings();
+
+        if ($encoding && in_array($encoding, $encodings)) {
+            $enc = $encoding;
+        } else {
+            $enc = mb_detect_encoding($var, $encodings, false);
+        }
 
         if (is_object($var) && method_exists($var, '__toString')) {
             $var = $var->__toString();
