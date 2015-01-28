@@ -16,6 +16,11 @@ If you wish to modify these settings, create a file called `local.json` and over
     print_filename: If set to true, the filename and line number from where dump() 
                     is called will be printed before the output. 
     string_cap:     When strings are printed by dump() they will be capped to this length.
+                    If set to 0 or false, string cap will be disabled.
+    line_endings    The line ending format your terminal is using.
+                    Can be set to: "LF" (linux), "CR" (old Mac) or "CRLF" (Windows)
+    output_encoding The character encoding of your terminal, eg. "UTF-8", "ISO-8859-1",
+                    "ASCII" etc... Accepts all values that are listed by `mb_list_encodings()`
     indent:         When printing arrays, each level will be indented this number of spaces.
     max_depth:      The maximum number of recursions (levels) when printing arrays.
 ```
