@@ -96,7 +96,7 @@ $bar->setData(array(
 * [dump()](#dump) Dump variables and formated printing.
 * [methods()](#methods) Dumps class methods or method code.
 * [backtrace()](#backtrace) Prints a backtrace.
-* [output()](#output) Outputs text.
+* [write()](#write) Outputs text.
 
 #### dump
 Formats and prints debug information of data. 
@@ -186,10 +186,10 @@ Prints a backtrace.
     void backtrace()
 ```
 
-#### output
+#### write
 Prints a string to the log without formating the text.
 
 ```php
-    void output(mixed $var)
+    void write(mixed $var)
 ```
 * `$var` The variable to print. If an object is passed, the __toString() method will be called to generate the output.
