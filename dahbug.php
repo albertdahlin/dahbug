@@ -640,6 +640,9 @@ class dahbug
                 $length     = mb_strlen($var, $enc);
                 $stringCap  = self::getData('string_cap');
                 $outEnc     = self::getData('output_encoding');
+                if ($stringCap && $recursion === 0 && $maxDepth > $stringCap) {
+                    $stringCap = $maxDepth;
+                }
 
                 if ($stringCap && $length > $stringCap) {
                     $var = mb_substr($var, 0, $stringCap, $enc);
