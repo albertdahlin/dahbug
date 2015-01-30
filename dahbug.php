@@ -898,6 +898,11 @@ class dahbug
      */
     static protected function _write($string)
     {
+        if (self::getData('output') == 'print') {
+            echo $string;
+            return;
+        }
+
         $logFile = self::$_logFile;
         fwrite($logFile, $string);
     }

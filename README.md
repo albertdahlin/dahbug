@@ -13,6 +13,8 @@ If you wish to modify these settings, create a file called `local.json` and over
 ```
     log_file:       This is the file where the output will be printed. 
                     Remember that it has to be writable by the web server.
+    output:         file: Logs dumps to log_file.
+                    print: Prints (echo) dumps to output.
     label_format:   The format of the labels printed by the dump() method.
     string_format:  String format for the dump() method.
     print_filename: If set to true, the filename and line number from where dump() 

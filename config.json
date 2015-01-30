@@ -1,5 +1,6 @@
 {
     "log_file": "/var/log/dahbug.log",
+    "output": "file",
     "label_format": "[%s]",
     "string_format": "'%s'",
     "print_filename": true,
