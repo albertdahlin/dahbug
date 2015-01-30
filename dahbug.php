@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Class dahbug 
+ * Class dahbug
  * A collection of useful dev functions for printing debug information
  * to a file.
  *
  * @copyright Copyright (C) 2015 Albert Dahlin
- * @author Albert Dahlin <info@albertdahlin.com> 
+ * @author Albert Dahlin <info@albertdahlin.com>
  * @license GNU GPL v3.0 <http://www.gnu.org/licenses/gpl-3.0.html>
  */
 
@@ -18,15 +18,15 @@ class dahbug
 
     /**
      * Instance for singleton pattern.
-     * 
+     *
      * @var dahbug
      * @access protected
      */
     static protected $_instance;
-    
+
     /**
-     * Config data. 
-     * 
+     * Config data.
+     *
      * @var array
      * @access protected
      */
@@ -34,7 +34,7 @@ class dahbug
 
     /**
      * Holds the file pointer to the log file.
-     * 
+     *
      * @var resource
      * @access protected
      */
@@ -42,7 +42,7 @@ class dahbug
 
     /**
      * Holds the backtrace array generated from debug_backtrace.
-     * 
+     *
      * @var array
      * @access protected
      */
@@ -50,24 +50,24 @@ class dahbug
 
     /**
      * Holds last printed filename.
-     * 
+     *
      * @var string
      * @access protected
      */
     static protected $_lastFilename;
+
     /**
      * Initializes debug. Reads two config files, config.json and local.json.
-     * 
+     *
      * @access public
      * @return void
      */
-
     static public function init()
     {
         self::setData('root', dirname(__file__));
         self::_loadConfigFile('config.json');
         self::_loadConfigFile('local.json');
-        
+
         $logFile = self::getData('log_file');
         if ($logFile) {
             self::$_logFile = fopen($logFile, 'a');
@@ -76,7 +76,7 @@ class dahbug
         if (!self::$_logFile) {
             throw new Exception("Can not open log file for writing {$logFile}");
         }
-        
+
         $eol = strtoupper(self::getData('line_endings'));
         switch ($eol) {
             case 'LF':
@@ -103,9 +103,9 @@ class dahbug
     }
 
     /**
-     * Loads config data from a json file and stores it in self::$_data 
-     * 
-     * @param string $filename 
+     * Loads config data from a json file and stores it in self::$_data
+     *
+     * @param string $filename
      * @static
      * @access protected
      * @return void
@@ -126,8 +126,8 @@ class dahbug
     }
 
     /**
-     * Returns singleton instance of dahbug. 
-     * 
+     * Returns singleton instance of dahbug.
+     *
      * @static
      * @access public
      * @return dahbug
@@ -143,9 +143,9 @@ class dahbug
 
     /**
      * Stores value into self::$_data array.
-     * 
-     * @param mixed $key 
-     * @param mixed $value 
+     *
+     * @param mixed $key
+     * @param mixed $value
      * @static
      * @access public
      * @return void
@@ -176,8 +176,8 @@ class dahbug
 
     /**
      * Returns data from self::$_data.
-     * 
-     * @param string $key 
+     *
+     * @param string $key
      * @static
      * @access public
      * @return mixed
@@ -221,7 +221,7 @@ class dahbug
 
     /**
      * Prints a backtrace.
-     * 
+     *
      * @static
      * @access public
      * @return void
@@ -303,7 +303,7 @@ class dahbug
 
     /**
      * Prints the methods of an object or a class, or the code of a method.
-     * 
+     *
      * @param mixed $object     The object or class to print.
      * @param string $method    If you specify method, it will print the code from it.
      * @static
@@ -367,8 +367,8 @@ class dahbug
 
     /**
      * Returns the code and the php doc from a ReflectionMethod.
-     * 
-     * @param ReflectionMethod $method 
+     *
+     * @param ReflectionMethod $method
      * @static
      * @access protected
      * @return string $string
@@ -398,8 +398,8 @@ class dahbug
 
     /**
      * Generates an array with class names as keys and an array of methods as values.
-     * 
-     * @param string $className 
+     *
+     * @param string $className
      * @static
      * @access protected
      * @return array $classes
@@ -423,8 +423,8 @@ class dahbug
 
     /**
      * Generates a string of method parameter declarations.
-     * 
-     * @param ReflectionMethod $ref 
+     *
+     * @param ReflectionMethod $ref
      * @static
      * @access protected
      * @return string $params
@@ -493,8 +493,8 @@ class dahbug
 
     /**
      * Prints a hex dump of a string.
-     * 
-     * @param string $bin 
+     *
+     * @param string $bin
      * @static
      * @access public
      * @return void
@@ -543,7 +543,7 @@ class dahbug
                     break;
                 }
                 $ord = ord($bin[$offset]);
-                if (($ord < 126) && ($ord > 31)) { 
+                if (($ord < 126) && ($ord > 31)) {
                     $ascii .= $bin[$offset];
                 } else {
                     $ascii .= '.';
@@ -562,7 +562,7 @@ class dahbug
 
     /**
      * Dump function
-     * 
+     *
      * @param mixed $var        The variable to dump.
      * @param string $label     An optional label.
      * @param int $maxLevels    Max recursion depth when printing arrays.
@@ -592,7 +592,7 @@ class dahbug
 
     /**
      * Formats var and generates a string.
-     * 
+     *
      * @param mixed $var
      * @param int $recursion
      * @param int $maxDepth
@@ -729,7 +729,7 @@ class dahbug
     /**
      * Prints filename from where the dump function was called to the log file.
      * Requires the self::$_backtrace array to be set from debug_backtrace().
-     * 
+     *
      * @static
      * @access protected
      * @return void
@@ -753,7 +753,7 @@ class dahbug
     /**
      * Prepares the label of the dumped variable.
      * Requires the self::$_backtrace array to be set from debug_backtrace().
-     * 
+     *
      * @param mixed $label
      * @static
      * @access protected
@@ -790,8 +790,8 @@ class dahbug
 
     /**
      * Formats a time given in micro seconds.
-     * 
-     * @param float $value 
+     *
+     * @param float $value
      * @static
      * @access protected
      * @return string
@@ -815,9 +815,9 @@ class dahbug
     /**
      * Prints a string to the log file without formatting. If an object is passed
      * the __toString function will be called and the result used for printing.
-     * 
-     * @param mixed  $var 
-     * @param string $encoding 
+     *
+     * @param mixed  $var
+     * @param string $encoding
      * @static
      * @access public
      * @return void
@@ -855,15 +855,14 @@ class dahbug
             $var = mb_convert_encoding($var, $outEnc, $enc);
         }
 
-        
         self::_write($var . DAHBUG_EOL);
     }
 
     /**
      * Adds terminal escape codes to colorize a string.
-     * 
-     * @param string $string 
-     * @param string $color 
+     *
+     * @param string $string
+     * @param string $color
      * @static
      * @access protected
      * @return string
@@ -890,7 +889,7 @@ class dahbug
 
     /**
      * Writes a string to a stream opened with fopen.
-     * 
+     *
      * @param string $string
      * @static
      * @access protected
@@ -907,14 +906,13 @@ class dahbug
         fwrite($logFile, $string);
     }
 
-
     /**
      * INSTANCE (NON-STATIC) DECLARATIONS
      */
 
     /**
      * The time when the request was started.
-     * 
+     *
      * @var float
      * @access protected
      */
@@ -922,7 +920,7 @@ class dahbug
 
     /**
      * Class constructor.
-     * 
+     *
      * @access public
      * @return void
      */
@@ -945,11 +943,10 @@ class dahbug
         $this->_requestTime = microtime(true);
     }
 
-
     /**
      * Returns a string containing log header information to print when the script
      * is initiated by an HTTP request.
-     * 
+     *
      * @access protected
      * @return string
      */
@@ -975,7 +972,7 @@ class dahbug
     /**
      * Returns a string containing log header information when the script
      * is initiated by the cli.
-     * 
+     *
      * @access protected
      * @return string
      */
@@ -989,7 +986,7 @@ class dahbug
     /**
      * Returns a string with log footer information to print at the end of
      * the script's execution.
-     * 
+     *
      * @access protected
      * @return string
      */
@@ -1011,7 +1008,7 @@ class dahbug
 
     /**
      * Instance destructor. Prints log footer and other pending information.
-     * 
+     *
      * @access public
      * @return void
      */
