@@ -3,6 +3,8 @@
     "output": "file",
     "label_format": "[%s]",
     "string_format": "'%s'",
+    "timestamp_format": "Y-m-d H:i:s",
+    "print_timestamp": true,
     "print_filename": true,
     "string_cap": 50,
     "line_endings": "LF",
