@@ -4,6 +4,7 @@
         "footer": "green",
         "label": "light_cyan",
         "key": "cyan",
+        "timestamp": "red",
         "dump_value": "white",
         "dump_int": "light_purple",
         "dump_string": "light_green",

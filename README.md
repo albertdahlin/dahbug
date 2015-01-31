@@ -11,25 +11,29 @@ If you wish to modify these settings, create a file called `local.json` and over
 ##### Configuration
 
 ```
-    log_file:       This is the file where the output will be printed. 
-                    Remember that it has to be writable by the web server.
-    output:         file: Logs dumps to log_file.
-                    print: Prints (echo) dumps to output.
-    label_format:   The format of the labels printed by the dump() method.
-    string_format:  String format for the dump() method.
-    print_filename: If set to true, the filename and line number from where dump() 
-                    is called will be printed before the output. 
-    string_cap:     When strings are printed by dump() they will be capped to this length.
-                    If set to 0 or false, string cap will be disabled.
-    line_endings    The line ending format your terminal is using.
-                    Can be set to: "LF" (linux), "CR" (old Mac) or "CRLF" (Windows)
-    output_encoding The character encoding of your terminal, eg. "UTF-8", "ISO-8859-1",
-                    "ASCII" etc... Accepts all values that are listed by `mb_list_encodings()`
-    indent:         When printing arrays, each level will be indented this number of spaces.
-    max_depth:      The maximum number of recursions (levels) when printing arrays.
-    use_colors:     Set to true if you want to colorize terminal output.
-    theme:          Select color theme. Themes are saved in <theme name>.theme files.
-    color:          Terminal color values. Don't touch...
+    log_file:         This is the file where the output will be printed. 
+                      Remember that it has to be writable by the web server.
+    output:           file: Logs dumps to log_file.
+                      print: Prints (echo) dumps to output.
+    label_format:     The format of the labels printed by the dump() method.
+    string_format:    String format for the dump() method.
+    timestamp_format: Format for the header timestamp. Checkout the PHP manual page for the
+                      `date()` function for format options.
+    print_timestamp:  If set to true, the timestamp will be added to the output header according
+                      to the format specified in the `timestamp_format` option.
+    print_filename:   If set to true, the filename and line number from where dump()
+                      is called will be printed before the output.
+    string_cap:       When strings are printed by dump() they will be capped to this length.
+                      If set to 0 or false, string cap will be disabled.
+    line_endings:     The line ending format your terminal is using.
+                      Can be set to: "LF" (linux), "CR" (old Mac) or "CRLF" (Windows)
+    output_encoding:  The character encoding of your terminal, eg. "UTF-8", "ISO-8859-1",
+                      "ASCII" etc... Accepts all values that are listed by `mb_list_encodings()`
+    indent:           When printing arrays, each level will be indented this number of spaces.
+    max_depth:        The maximum number of recursions (levels) when printing arrays.
+    use_colors:       Set to true if you want to colorize terminal output.
+    theme:            Select color theme. Themes are saved in <theme name>.theme files.
+    color:            Terminal color values. Don't touch...
 ```
 
 ##### Color themes
