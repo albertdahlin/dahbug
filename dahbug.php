@@ -888,6 +888,24 @@ class dahbug
     }
 
     /**
+     * Formats a string with underline.
+     * 
+     * @param string $string
+     * @static
+     * @access protected
+     * @return string $string
+     */
+    static protected function _underline($string)
+    {
+        if (!self::getData('use_colors')) {
+            return $string;
+        }
+
+        $string = "\033[4m" . $string . "\033[24m";
+
+        return $string;
+    }
+
      * Writes a string to a stream opened with fopen.
      *
      * @param string $string
