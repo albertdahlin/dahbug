@@ -7,6 +7,7 @@
     "print_timestamp": true,
     "print_filename": true,
     "string_cap": 50,
+    "ascii_notation": "escape",
     "line_endings": "LF",
     "output_encoding": "UTF-8",
     "indent": 4,
@@ -26,5 +27,16 @@
         "light_purple": "1;35",
         "yellow": "1;33",
         "white": "1;37"
+    },
+    "escape_chars": {
+        "0": "\\0",
+        "7": "\\a",
+        "8": "\\b",
+        "9": "\\t",
+        "10": "\\n",
+        "11": "\\v",
+        "12": "\\f",
+        "13": "\\r",
+        "27": "\\e"
     }
 }

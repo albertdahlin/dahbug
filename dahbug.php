@@ -574,7 +574,7 @@ class dahbug
     {
         self::$_backtrace = debug_backtrace();
 
-        if (!$maxDepth || !is_int($maxDepth)) {
+        if (!is_int($maxDepth)) {
             $maxDepth = self::getData('max_depth');
         }
 
@@ -637,26 +637,51 @@ class dahbug
 
             case 'string':
                 $enc        = mb_detect_encoding($var, mb_list_encodings(), false);
-                $length     = mb_strlen($var, $enc);
+                $length     = strlen($var);
                 $stringCap  = self::getData('string_cap');
                 $outEnc     = self::getData('output_encoding');
-                if ($stringCap && $recursion === 0 && $maxDepth > $stringCap) {
-                    $stringCap = $maxDepth;
+
+                if ($stringCap && $recursion === 0) {
+                    if ($maxDepth > $stringCap) {
+                        $stringCap = $maxDepth;
+                    } elseif ($maxDepth === 0) {
+                        $stringCap = 0;
+                    }
                 }
 
-                if ($stringCap && $length > $stringCap) {
-                    $var = mb_substr($var, 0, $stringCap, $enc);
-                    $var .= '...';
-                }
-                $var = str_replace(array("\n", "\r"), array('\n', '\r'), $var);
                 $var = mb_convert_encoding($var, $outEnc, $enc);
-                $var = self::_colorize(
-                    $var,
+
+                $i = $len = 0;
+                $string = '';
+                for ($i = 0; $i < $length; $i++) {
+                    $ord = ord($var[$i]);
+                    if ($ord < 32) {
+                        /**
+                         * Get printable representation of ascii cc.
+                         */
+                        $string .= self::_underline(
+                            self::_getAsciiCC($var[$i])
+                        );
+                        $len += 2;
+                    } else {
+                        $string .= $var[$i];
+                        $len++;
+                    }
+
+                    if ($stringCap && $len > $stringCap) {
+                        $string .= '...';
+                        break;
+                    }
+                }
+
+                $string = self::_colorize(
+                    $string,
                     'dump_string'
                 );
 
-                $string = sprintf('(string:%d:%s) ', $length, $enc);
-                $string .= sprintf(self::getData('string_format'), $var);
+                $length = mb_strlen($var, $enc);
+                $label  = sprintf('(string:%d:%s) ', $length, $enc);
+                $string = $label . sprintf(self::getData('string_format'), $string);
 
                 return $string;
 
@@ -906,6 +931,38 @@ class dahbug
         return $string;
     }
 
+    /**
+     * Returns a printable ascii control character representation.
+     * 
+     * @param string $chr 
+     * @static
+     * @access protected
+     * @return string
+     */
+    static protected function _getAsciiCC($chr)
+    {
+        $notation = self::getData('ascii_notation');
+        $ord = ord($chr);
+        switch ($notation) {
+            case 'caret':
+                $chr = '^' . chr($ord + 64);
+                break;
+
+            case 'escape':
+                $charMap = self::getData('escape_chars');
+                if (isset($charMap[$ord])) {
+                    $chr = $charMap[$ord];
+                } else {
+                    $chr = '\?';
+                }
+
+                break;
+        }
+
+        return $chr;
+    }
+
+    /**
      * Writes a string to a stream opened with fopen.
      *
      * @param string $string
