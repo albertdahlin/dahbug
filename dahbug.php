@@ -934,9 +934,9 @@ class dahbug
         $string = self::_colorize($string, 'header');
 
         if (self::getData('print_timestamp')) {
-            $timestamp_format = self::getData('timestamp_format');
-            $timestamp        = self::_colorize(date($timestamp_format), 'timestamp');
-            $string           = "$timestamp $string";
+            $timestampFormat  = self::getData('timestamp_format');
+            $timestamp        = self::_colorize(date($timestampFormat), 'timestamp');
+            $string           = "{$timestamp} {$string}";
         }
 
         self::_write($string . DAHBUG_EOL . DAHBUG_EOL);
