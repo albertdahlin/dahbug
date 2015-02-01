@@ -25,6 +25,8 @@ If you wish to modify these settings, create a file called `local.json` and over
                       is called will be printed before the output.
     string_cap:       When strings are printed by dump() they will be capped to this length.
                       If set to 0 or false, string cap will be disabled.
+    ascii_notation    "caret" or "escape". How to output non printable ascii characters.
+                      eg. new line will be printed as ^J (caret) or \n (escape).
     line_endings:     The line ending format your terminal is using.
                       Can be set to: "LF" (linux), "CR" (old Mac) or "CRLF" (Windows)
     output_encoding:  The character encoding of your terminal, eg. "UTF-8", "ISO-8859-1",
@@ -34,6 +36,7 @@ If you wish to modify these settings, create a file called `local.json` and over
     use_colors:       Set to true if you want to colorize terminal output.
     theme:            Select color theme. Themes are saved in <theme name>.theme files.
     color:            Terminal color values. Don't touch...
+    escape_chars      Escape character map. Don't touch...
 ```
 
 ##### Color themes
