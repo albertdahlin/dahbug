@@ -884,7 +884,7 @@ class dahbug
     }
 
     /**
-     * Adds terminal escape codes to colorize a string.
+     * Adds ANSI escape codes to colorize a string.
      *
      * @param string $string
      * @param string $color
@@ -913,8 +913,8 @@ class dahbug
     }
 
     /**
-     * Formats a string with underline.
-     * 
+     * Adds ANSI escape codes to format a string with underline.
+     *
      * @param string $string
      * @static
      * @access protected
