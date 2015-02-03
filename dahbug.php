@@ -897,12 +897,14 @@ class dahbug
         if (!self::getData('use_colors')) {
             return $string;
         }
+        $color = self::getData('theme_colors/' . $color);
 
-        $colorNumber = self::getData('color/' . $color);
-        if (!$colorNumber) {
-            $color = self::getData('theme_colors/' . $color);
+        if (preg_match('/^[0-2]\d\d$/', $color)) {
+            $colorNumber = '38;5;' . $color;
+        } else {
             $colorNumber = self::getData('color/' . $color);
         }
+
         if (!$colorNumber) {
             return $string;
         }
