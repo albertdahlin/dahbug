@@ -157,6 +157,10 @@ class dahbug
     {
         if (is_array($key)) {
             self::$_data = $key;
+        } else if (is_array($value)) {
+            foreach ($value as $k => $v) {
+                self::setData($key . '/' . $k, $v);
+            }
         } else {
             if (strpos($key, '/')) {
                 $keyArr = explode('/', $key);
