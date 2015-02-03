@@ -41,7 +41,9 @@ If you wish to modify these settings, create a file called `local.json` and over
 
 ##### Color themes
 You can create your own color themes. Just copy `default.theme` and change the colors.
-Valid color values are found in the config.json file.
+Valid color values for standard 16 color terminal can be found in the config.json file.
+For 256 color mode values, run `php palette.php` and it will print a palette with color values.
+Use the three digit values from the palette to create your theme.
 
 ### 2. Usage
 Just make a static call to the method you want to use:
