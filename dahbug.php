@@ -97,7 +97,10 @@ class dahbug
         }
 
         $theme = self::getData('theme');
-        self::_loadConfigFile($theme . '.theme');
+        self::_loadConfigFile('default.theme');
+        if ($theme && $theme !== 'default') {
+            self::_loadConfigFile($theme . '.theme');
+        }
 
         self::getInstance();
     }
