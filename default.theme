@@ -14,6 +14,9 @@
         "dump_float": "purple",
         "methods_class": "white",
         "methods_function": "light_cyan",
-        "methods_param": "light_blue"
+        "methods_param": "light_blue",
+        "class_label": "white",
+        "extends_label": "white",
+        "class_extends": "white"
     }
 }

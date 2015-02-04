@@ -343,7 +343,12 @@ class dahbug
             $refMethod = new ReflectionMethod($className, $method);
             $string .= self::_getMethodInfo($refMethod);
         } else {
-            $label = "class";
+            $label = self::_colorize(
+                'class',
+                'class_label'
+            );
+            $mainClass = true;
+
             $classes = self::_getClassMethods($className);
             $string .= "Methods of {$className}" . DAHBUG_EOL;
 
@@ -351,8 +356,9 @@ class dahbug
                 $string .= " {$label} ";
                 $string .= self::_colorize(
                     $class,
-                    'methods_class'
+                    ($mainClass === true) ? 'methods_class' : 'class_extends'
                 );
+                $mainClass = false;
                 $string .= DAHBUG_EOL;
                 foreach ($methods as $method) {
                     $ref = new ReflectionMethod($class, $method);
@@ -364,7 +370,10 @@ class dahbug
                     );
                     $string .= "({$params})" . DAHBUG_EOL;
                 }
-                $label = 'extends';
+                $label = self::_colorize(
+                    'extends',
+                    'extends_label'
+                );
                 $string .= DAHBUG_EOL;
             }
         }
@@ -942,8 +951,8 @@ class dahbug
 
     /**
      * Returns a printable ascii control character representation.
-     * 
-     * @param string $chr 
+     *
+     * @param string $chr
      * @static
      * @access protected
      * @return string
