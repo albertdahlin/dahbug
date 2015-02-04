@@ -13,10 +13,10 @@
         "dump_bool": "063",
         "dump_array": "038",
         "dump_float": "063",
-        "class_label": "038",
+        "methods_class_label": "038",
         "methods_class": "254",
-        "extends_label": "197",
-        "class_extends": "076",
+        "methods_extends_label": "197",
+        "methods_class_extends": "076",
         "methods_function": "076",
         "methods_param": "254"
     }

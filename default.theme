@@ -15,8 +15,8 @@
         "methods_class": "white",
         "methods_function": "light_cyan",
         "methods_param": "light_blue",
-        "class_label": "white",
-        "extends_label": "white",
-        "class_extends": "white"
+        "methods_class_label": "white",
+        "methods_extends_label": "white",
+        "methods_class_extends": "white"
     }
 }

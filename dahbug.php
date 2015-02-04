@@ -345,7 +345,7 @@ class dahbug
         } else {
             $label = self::_colorize(
                 'class',
-                'class_label'
+                'methods_class_label'
             );
             $mainClass = true;
 
@@ -356,7 +356,7 @@ class dahbug
                 $string .= " {$label} ";
                 $string .= self::_colorize(
                     $class,
-                    ($mainClass === true) ? 'methods_class' : 'class_extends'
+                    ($mainClass === true) ? 'methods_class' : 'methods_class_extends'
                 );
                 $mainClass = false;
                 $string .= DAHBUG_EOL;
@@ -372,7 +372,7 @@ class dahbug
                 }
                 $label = self::_colorize(
                     'extends',
-                    'extends_label'
+                    'methods_extends_label'
                 );
                 $string .= DAHBUG_EOL;
             }
