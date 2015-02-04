@@ -598,7 +598,7 @@ class dahbug
             self::_printFilename();
         }
 
-        $label = self::_prepareLabel($label, true);
+        $label = self::_prepareLabel($label, 'label');
         $string = self::_formatVar($var, 0, $maxDepth);
         $string .= DAHBUG_EOL;
         self::_write($label . ' = ' . $string);
@@ -627,7 +627,7 @@ class dahbug
         switch ($type) {
             case 'object':
                 $string = sprintf('(object:%d) ', count((array)$var));
-                $string .= self::_colorize(get_class($var), 'dump_value');
+                $string .= self::_colorize(get_class($var), 'dump_classname');
                 if ($recursion < 1) {
                     foreach ((array)$var as $key => $value) {
                         $string .= DAHBUG_EOL;
@@ -635,7 +635,7 @@ class dahbug
                             $string .= '  ';
                         }
                         $string .= str_repeat(' ', ($recursion + 1) * self::getData('indent'));
-                        $string .= self::_prepareLabel($key) . ' => ';
+                        $string .= self::_prepareLabel($key, 'key_property') . ' => ';
                         $string .= self::_formatVar($value, $recursion + 1, $maxDepth);
                     }
                 }
@@ -800,7 +800,7 @@ class dahbug
      * @access protected
      * @return string $label
      */
-    static protected function _prepareLabel($label, $line = false)
+    static protected function _prepareLabel($label, $type = null)
     {
         $backtrace = self::$_backtrace;
 
@@ -816,13 +816,21 @@ class dahbug
             }
         }
 
+        if ($type) {
+            $labelType = $type;
+        } elseif (is_int($label)) {
+            $labelType = 'key_int';
+        } else {
+            $labelType = 'key_string';
+        }
+
         $label = self::_colorize(
             $label,
-            $line ? 'label' : 'key'
+            $labelType
         );
         $label = sprintf(self::getData('label_format'), $label);
 
-        if ($line && self::getData('print_filename')) {
+        if ($type == 'label' && self::getData('print_filename')) {
             $label = str_pad($backtrace[0]['line'], 4) . $label;
         }
 
