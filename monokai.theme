@@ -1,12 +1,15 @@
 {
+    "background": "232",
     "theme_colors": {
         "header": "197",
         "footer": "191",
         "label": "254",
         "key_int": "063",
-        "key_str": "191",
+        "key_string": "191",
+        "key_property": "197",
         "timestamp": "038",
         "dump_value": "254",
+        "dump_classname": "076",
         "dump_int": "063",
         "dump_string": "191",
         "dump_null": "063",

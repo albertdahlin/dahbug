@@ -926,14 +926,16 @@ class dahbug
         if (preg_match('/^[0-2]\d\d$/', $color)) {
             $colorNumber = '38;5;' . $color;
         } else {
-            $colorNumber = self::getData('color/' . $color);
+            $colorNumber = explode(';', self::getData('color/' . $color));
+            $colorNumber[1] = '3' . $colorNumber[1];
+            $colorNumber = implode(';', $colorNumber);
         }
 
         if (!$colorNumber) {
             return $string;
         }
 
-        $string = "\033[{$colorNumber}m" . $string . "\033[0m";
+        $string = "\033[{$colorNumber}m" . $string . "\033[39m";
 
         return $string;
     }
@@ -1032,6 +1034,15 @@ class dahbug
         } else {
             $string = $this->_getCliDumpHeader();
         }
+        $bg = self::getData('background');
+        if (preg_match('/^[0-2]\d\d$/', $bg)) {
+            $bg = '48;5;' . $bg;
+        } else {
+            $bg = self::getData('color/' . $bg);
+            $bg = explode(';', $bg);
+            $bg = '4' . $bg[1];
+        }
+        self::write("\033[{$bg}m");
         $string = self::_colorize($string, 'header');
 
         if (self::getData('print_timestamp')) {
@@ -1103,6 +1114,7 @@ class dahbug
         $string = self::_colorize($string, 'footer');
         $string .= DAHBUG_EOL;
         $string .= DAHBUG_EOL;
+        $string .= "\033[0m";
 
         return $string;
     }

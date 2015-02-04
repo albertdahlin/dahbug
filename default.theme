@@ -1,4 +1,5 @@
 {
+    "background": "black",
     "theme_colors": {
         "header": "light_green",
         "footer": "green",
