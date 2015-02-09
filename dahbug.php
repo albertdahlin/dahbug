@@ -665,7 +665,6 @@ class dahbug
                     }
                 }
 
-                $var = mb_convert_encoding($var, $outEnc, $enc);
 
                 $i = $len = 0;
                 $string = '';
@@ -690,6 +689,7 @@ class dahbug
                     }
                 }
 
+                $var = mb_convert_encoding($var, $outEnc, $enc);
                 $string = self::_colorize(
                     $string,
                     'dump_string'
@@ -1035,14 +1035,16 @@ class dahbug
             $string = $this->_getCliDumpHeader();
         }
         $bg = self::getData('background');
-        if (preg_match('/^[0-2]\d\d$/', $bg)) {
-            $bg = '48;5;' . $bg;
-        } else {
-            $bg = self::getData('color/' . $bg);
-            $bg = explode(';', $bg);
-            $bg = '4' . $bg[1];
+        if ($bg) {
+            if (preg_match('/^[0-2]\d\d$/', $bg)) {
+                $bg = '48;5;' . $bg;
+            } else {
+                $bg = self::getData('color/' . $bg);
+                $bg = explode(';', $bg);
+                $bg = '4' . $bg[1];
+            }
+            self::write("\033[{$bg}m");
         }
-        self::write("\033[{$bg}m");
         $string = self::_colorize($string, 'header');
 
         if (self::getData('print_timestamp')) {
