@@ -223,3 +223,10 @@ Prints a hex dump of a binary string.
     void hex(string $bin)
 ```
 * `$bin` The binary string you want to dump.
+
+#### nl
+Prints a new line to the log file.
+
+```php
+    void nl()
+```
