@@ -118,6 +118,7 @@ $bar->setData(array(
 * [backtrace()](#backtrace) Prints a backtrace.
 * [write()](#write) Outputs text.
 * [hex()](#hex) Prints a hex dump.
+* [nl()](#nl) Prints a newline.
 
 #### dump
 Formats and prints debug information of data. 
