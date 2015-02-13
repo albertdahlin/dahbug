@@ -309,6 +309,18 @@ class dahbug
     }
 
     /**
+     * Writes a new line.
+     * 
+     * @static
+     * @access public
+     * @return void
+     */
+    static public function nl()
+    {
+        self::_write(DAHBUG_EOL);
+    }
+
+    /**
      * Prints the methods of an object or a class, or the code of a method.
      *
      * @param mixed $object     The object or class to print.
