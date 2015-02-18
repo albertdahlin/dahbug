@@ -571,7 +571,7 @@ class dahbug
                     break;
                 }
                 $ord = ord($bin[$offset]);
-                if (($ord < 126) && ($ord > 31)) {
+                if (($ord < 127) && ($ord > 31)) {
                     $ascii .= $bin[$offset];
                 } else {
                     $ascii .= '.';
