@@ -365,12 +365,16 @@ class dahbug
             $string .= "Methods of {$className}" . DAHBUG_EOL;
 
             foreach ($classes as $class => $methods) {
+                $refClass = new ReflectionClass($class);
                 $string .= " {$label} ";
                 $string .= self::_colorize(
                     $class,
                     ($mainClass === true) ? 'methods_class' : 'methods_class_extends'
                 );
                 $mainClass = false;
+                if ($refClass->isInternal()) {
+                    $string .= "  (internal)";
+                }
                 $string .= DAHBUG_EOL;
                 foreach ($methods as $method) {
                     $ref = new ReflectionMethod($class, $method);
@@ -403,8 +407,12 @@ class dahbug
      */
     static protected function _getMethodInfo(ReflectionMethod $method)
     {
+        $class = $method->getDeclaringClass()->getName();
+        if ($method->isInternal()) {
+            return "{$class}::{$method->getName()}() is an internal method." . DAHBUG_EOL;
+        }
         $string = '';
-        $string .= "defined in class {$method->getDeclaringClass()->getName()}" . DAHBUG_EOL;
+        $string .= "defined in class {$class}" . DAHBUG_EOL;
         $string .= "  file {$method->getFileName()}:{$method->getStartLine()}" . DAHBUG_EOL;
         $string .= "    {$method->getDocComment()}" . DAHBUG_EOL;
         $file = file($method->getFileName());
@@ -470,7 +478,7 @@ class dahbug
                 $declaration,
                 'methods_param'
             );
-            if ($param->isOptional()) {
+            if ($param->isDefaultValueAvailable() && $param->isOptional()) {
                 $defaultValue = $param->getDefaultValue();
                 if (is_array($defaultValue)) {
                     $value = self::_colorize(
