@@ -638,11 +638,7 @@ class dahbug
      */
     static protected function _formatVar($var, $recursion = 0, $maxDepth = null)
     {
-        if ($recursion === 0 && is_callable($var)) {
-            $type = 'callable';
-        } else {
-            $type = gettype($var);
-        }
+        $type = gettype($var);
 
         switch ($type) {
             case 'object':
@@ -771,16 +767,6 @@ class dahbug
                 );
 
                 return '(resource) ' . $string;
-
-            case 'callable':
-                $name = '';
-                is_callable($var, false, $name);
-                $string = self::_colorize(
-                    $name,
-                    'dump_value'
-                );
-
-                return '(callable) ' . $string;
 
             default:
                 return 'Unknown Type';
