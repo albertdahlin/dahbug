@@ -879,19 +879,31 @@ class dahbug
      */
     static public function write($var, $encoding = null)
     {
+
         $lineEndings        = strtoupper(self::getData('line_endings'));
         $outputEncoding     = self::getData('output_encoding');
         $encodings          = mb_list_encodings();
         $outEnc             = self::getData('output_encoding');
 
+        if (is_object($var)) {
+             if (method_exists($var, '__toString')) {
+                $var = $var->__toString();
+            } else {
+                $class = get_class($var);
+                self::write("Can not convert object {$class} to string.");
+            }
+        }
+
+        if (!is_scalar($var)) {
+            $type = gettype($var);
+            self::write("Can not write variable of type {$type}");
+            return;
+        }
+
         if ($encoding && in_array($encoding, $encodings)) {
             $enc = $encoding;
         } else {
             $enc = mb_detect_encoding($var, $encodings, false);
-        }
-
-        if (is_object($var) && method_exists($var, '__toString')) {
-            $var = $var->__toString();
         }
 
         switch ($lineEndings) {
