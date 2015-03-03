@@ -815,7 +815,9 @@ class dahbug
             $label = $file[$backtrace[0]['line']-1];
             $label = trim($label);
             $label = substr($label, strpos($label, 'dahbug') + 13);
-            if (strpos($label, ',')) {
+            if (strpos($label, '),') < strpos($label, ',')) {
+                $label = substr($label, 0, strpos($label, '),'));
+            } else if (strpos($label, ',')) {
                 $label = substr($label, 0, strpos($label, ','));
             } else {
                 $label = substr($label, 0, strpos($label, ');'));
