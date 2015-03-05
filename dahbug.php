@@ -955,7 +955,7 @@ class dahbug
             return $string;
         }
 
-        $string = "\033[{$colorNumber}m" . $string . "\033[39m";
+        $string = "\033[{$colorNumber}m" . $string . "\033[0m";
 
         return $string;
     }
