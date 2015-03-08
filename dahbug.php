@@ -812,14 +812,32 @@ class dahbug
 
         if ($label === null) {
             $file  = file($backtrace[0]['file']);
-            $label = $file[$backtrace[0]['line']-1];
+            $i = 1;
+            $label = $file[$backtrace[0]['line'] - $i];
+
+            /**
+             * Find dahbug on multiline statments.
+             */
+            while (strpos($label, 'dahbug') === false) {
+                $label = trim(str_replace(array("\n", "\r"), '', $file[$backtrace[0]['line'] - ++$i])) . $label;
+            }
             $label = trim($label);
             $label = substr($label, strpos($label, 'dahbug') + 13);
-            if (strpos($label, ',')) {
-                $label = substr($label, 0, strpos($label, ','));
-            } else {
-                $label = substr($label, 0, strpos($label, ');'));
+            $i = 1;
+            /**
+             * Find the closing parenthesis.
+             */
+            foreach (str_split($label) as $k => $char) {
+                if ($char == '(') {
+                    $i++;
+                } elseif ($char == ')') {
+                    $i--;
+                }
+                if ($i === 0) {
+                    break;
+                }
             }
+            $label = substr($label, 0, $k);
         }
 
         if ($type) {
