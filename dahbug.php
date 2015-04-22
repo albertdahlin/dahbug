@@ -327,7 +327,7 @@ class dahbug
      * @param string $method    If you specify method, it will print the code from it.
      * @static
      * @access public
-     * @return void
+     * @return mixed $object
      */
     static public function methods($object, $method = null)
     {
@@ -395,6 +395,8 @@ class dahbug
         }
 
         self::_write($string);
+
+        return $object;
     }
 
     /**
