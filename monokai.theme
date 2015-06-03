@@ -1,5 +1,5 @@
 {
-    "background": "232",
+    "background": false,
     "theme_colors": {
         "header": "197",
         "footer": "191",
