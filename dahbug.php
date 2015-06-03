@@ -859,33 +859,37 @@ class dahbug
         $backtrace = self::$_backtrace;
 
         if ($label === null) {
-            $file  = file($backtrace[0]['file']);
-            $i = 1;
-            $label = $file[$backtrace[0]['line'] - $i];
+            if (is_file($backtrace[0]['file'])) {
+                $file  = file($backtrace[0]['file']);
+                $i = 1;
+                $label = $file[$backtrace[0]['line'] - $i];
 
-            /**
-             * Find dahbug on multiline statments.
-             */
-            while (strpos($label, 'dahbug') === false) {
-                $label = trim(str_replace(array("\n", "\r"), '', $file[$backtrace[0]['line'] - ++$i])) . $label;
-            }
-            $label = trim($label);
-            $label = substr($label, strpos($label, 'dahbug') + 13);
-            $i = 1;
-            /**
-             * Find the closing parenthesis.
-             */
-            foreach (str_split($label) as $k => $char) {
-                if ($char == '(') {
-                    $i++;
-                } elseif ($char == ')') {
-                    $i--;
+                /**
+                 * Find dahbug on multiline statments.
+                 */
+                while (strpos($label, 'dahbug') === false) {
+                    $label = trim(str_replace(array("\n", "\r"), '', $file[$backtrace[0]['line'] - ++$i])) . $label;
                 }
-                if ($i === 0) {
-                    break;
+                $label = trim($label);
+                $label = substr($label, strpos($label, 'dahbug') + 13);
+                $i = 1;
+                /**
+                 * Find the closing parenthesis.
+                 */
+                foreach (str_split($label) as $k => $char) {
+                    if ($char == '(') {
+                        $i++;
+                    } elseif ($char == ')') {
+                        $i--;
+                    }
+                    if ($i === 0) {
+                        break;
+                    }
                 }
+                $label = substr($label, 0, $k);
+            } else {
+                $label = $backtrace[0]['file'];
             }
-            $label = substr($label, 0, $k);
         }
 
         if ($type) {
