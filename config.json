@@ -13,7 +13,7 @@
     "indent": 4,
     "max_depth": 3,
     "use_colors": true,
-    "theme": "default",
+    "theme": "monokai",
     "color": {
         "black": "0;0",
         "grey": "1;0",
