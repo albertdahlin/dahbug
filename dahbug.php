@@ -57,6 +57,14 @@ class dahbug
     static protected $_lastFilename;
 
     /**
+     * Timers
+     *
+     * @var array
+     * @access protected
+     */
+    static protected $_timers = array();
+
+    /**
      * Initializes debug. Reads two config files, config.json and local.json.
      *
      * @access public
@@ -245,8 +253,8 @@ class dahbug
             $args = array();
             foreach ($data['args'] as $arg) {
                 if (is_string($arg)) {
-                    if (strlen($arg) > 20) {
-                        $arg = '...' . substr($arg, -20);
+                    if (strlen($arg) > 100) {
+                        $arg = '...' . substr($arg, -100);
                     }
                     $arg = self::_colorize(
                         $arg,
@@ -596,6 +604,44 @@ class dahbug
         }
 
         self::_write($string);
+    }
+
+    /**
+     * Start a timer
+     *
+     * @param string $name
+     * @static
+     * @access public
+     * @return void
+     */
+    static public function startTimer($name)
+    {
+        if (isset(self::$_timers[$name])) {
+            self::_write("Timer {$name} is already started." . DAHBUG_EOL);
+        } else {
+            self::$_timers[$name] = microtime(true);
+        }
+    }
+
+    /**
+     * Stop and print timer.
+     *
+     * @param string $name
+     * @static
+     * @access public
+     * @return void
+     */
+    static public function stopTimer($name)
+    {
+        if (isset(self::$_timers[$name])) {
+            $time = self::_formatTime(
+                microtime(true) - self::$_timers[$name]
+            );
+            self::_write("Timer {$name}: {$time}" . DAHBUG_EOL);
+            unset(self::$_timers[$name]);
+        } else {
+            self::_write("Timer {$name} is not started." . DAHBUG_EOL);
+        }
     }
 
     /**
