@@ -65,6 +65,14 @@ class dahbug
     static protected $_timers = array();
 
     /**
+     * If set to true, output will be disabled.
+     *
+     * @var array
+     * @access protected
+     */
+    static protected $_isDisabled = false;
+
+    /**
      * Initializes debug. Reads two config files, config.json and local.json.
      *
      * @access public
@@ -77,6 +85,7 @@ class dahbug
         self::_loadConfigFile('local.json');
 
         $logFile = self::getData('log_file');
+
         if ($logFile) {
             self::$_logFile = fopen($logFile, 'a');
         }
@@ -110,7 +119,25 @@ class dahbug
             self::_loadConfigFile($theme . '.theme');
         }
 
+        self::_checkDisabled();
+
         self::getInstance();
+    }
+
+    /**
+     * Check if output should be disabled.
+     *
+     * @static
+     * @access protected
+     * @return void
+     */
+    static protected function _checkDisabled()
+    {
+        if (self::getData('use_cookie')) {
+            if (!isset($_COOKIE['dahbug'])) {
+                self::$_isDisabled = true;
+            }
+        }
     }
 
     /**
@@ -1088,6 +1115,9 @@ class dahbug
      */
     static protected function _write($string)
     {
+        if (self::$_isDisabled) {
+            return;
+        }
         if (self::getData('output') == 'print') {
             echo $string;
             return;
