@@ -1,0 +1,26 @@
+{
+    "background": "232",
+    "theme_colors": {
+        "header": "197",
+        "footer": "197",
+        "label": "254",
+        "key_int": "009",
+        "key_string": "010",
+        "key_property": "003",
+        "timestamp": "038",
+        "dump_value": "254",
+        "dump_classname": "002",
+        "dump_int": "009",
+        "dump_string": "255",
+        "dump_null": "009",
+        "dump_bool": "009",
+        "dump_array": "011",
+        "dump_float": "009",
+        "methods_class_label": "002",
+        "methods_class": "254",
+        "methods_extends_label": "013",
+        "methods_class_extends": "010",
+        "methods_function": "003",
+        "methods_param": "011"
+    }
+}
