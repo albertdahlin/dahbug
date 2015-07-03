@@ -140,6 +140,11 @@ class dahbug
         }
     }
 
+    static public function isDisabled($flag = true)
+    {
+        self::$_isDisabled = $flag;
+    }
+
     /**
      * Loads config data from a json file and stores it in self::$_data
      *
@@ -859,7 +864,7 @@ class dahbug
     static protected function _printFilename()
     {
         $backtrace = self::$_backtrace;
-        $filename = $backtrace[0]['file'];
+        $filename = isset($backtrace[0]['file']) ? $backtrace[0]['file'] : '';
 
         if ($filename != self::$_lastFilename) {
             $string = 'In file ';
@@ -886,7 +891,7 @@ class dahbug
         $backtrace = self::$_backtrace;
 
         if ($label === null) {
-            if (is_file($backtrace[0]['file'])) {
+            if (isset($backtrace[0]['file']) && is_file($backtrace[0]['file'])) {
                 $file  = file($backtrace[0]['file']);
                 $i = 1;
                 $label = $file[$backtrace[0]['line'] - $i];
@@ -895,7 +900,11 @@ class dahbug
                  * Find dahbug on multiline statments.
                  */
                 while (strpos($label, 'dahbug') === false) {
-                    $label = trim(str_replace(array("\n", "\r"), '', $file[$backtrace[0]['line'] - ++$i])) . $label;
+                    $lineNumber = $backtrace[0]['line'] - ++$i;
+                    if ($lineNumber < 0) {
+                        break;
+                    }
+                    $label = trim(str_replace(array("\n", "\r"), '', $file[$lineNumber])) . $label;
                 }
                 $label = trim($label);
                 $label = substr($label, strpos($label, 'dahbug') + 13);
@@ -915,8 +924,15 @@ class dahbug
                 }
                 $label = substr($label, 0, $k);
             } else {
-                $label = $backtrace[0]['file'];
+                $label = isset($backtrace[0]['file']) ? $backtrace[0]['file'] : '-';
             }
+        }
+
+        if (is_object($label)) {
+            $label = get_class($label);
+        }
+        if (is_array($label)) {
+            $label = "Array";
         }
 
         if ($type) {
@@ -934,7 +950,8 @@ class dahbug
         $label = sprintf(self::getData('label_format'), $label);
 
         if ($type == 'label' && self::getData('print_filename')) {
-            $label = str_pad($backtrace[0]['line'], 4) . $label;
+            $line = isset($backtrace[0]['line']) ? $backtrace[0]['line'] : '';
+            $label = str_pad($line, 4) . $label;
         }
 
         return $label;
