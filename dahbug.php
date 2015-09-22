@@ -350,7 +350,7 @@ class dahbug
 
     /**
      * Writes a new line.
-     * 
+     *
      * @static
      * @access public
      * @return void
@@ -979,6 +979,32 @@ class dahbug
         };
 
         return $value . ' ' . $prefix;
+    }
+
+    /**
+     * Parses a PDO SQL with bind data into a executable SQL.
+     *
+     * @param string $query
+     * @param array  $binds
+     * @param string $encoding
+     * @static
+     * @access public
+     * @return string
+     */
+    static public function writeSql($query, $binds = array(), $encoding = null) {
+        $keys = array();
+
+        foreach ($binds as $key => $value) {
+            if (is_string($key)) {
+                $keys[] = "/:{$key}/";
+            } else {
+                $keys[] = '/[?]/';
+            }
+        }
+
+        $query = preg_replace($keys, $binds, $query, 1, $count);
+
+        return self::write($query);
     }
 
     /**
