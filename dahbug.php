@@ -656,6 +656,23 @@ class dahbug
     }
 
     /**
+     * Toggle timer.
+     *
+     * @param string $name
+     * @static
+     * @access public
+     * @return void
+     */
+    public static function toggleTimer($name)
+    {
+        if (isset(self::$_timers[$name])) {
+            self::stopTimer($name);
+        } else {
+            self::startTimer($name);
+        }
+    }
+
+    /**
      * Stop and print timer.
      *
      * @param string $name
@@ -666,9 +683,17 @@ class dahbug
     static public function stopTimer($name)
     {
         if (isset(self::$_timers[$name])) {
-            $time = self::_formatTime(
-                microtime(true) - self::$_timers[$name]
-            );
+            $time = microtime(true) - self::$_timers[$name];
+
+            if ($time >= 1) {
+                $color = 'timer_s';
+            } elseif ($time >= .001) {
+                $color = 'timer_ms';
+            } else {
+                $color = 'timer_us';
+            }
+
+            $time = self::_colorize(self::_formatTime($time), $color);
             self::_write("Timer {$name}: {$time}" . DAHBUG_EOL);
             unset(self::$_timers[$name]);
         } else {

@@ -21,6 +21,9 @@
         "methods_extends_label": "197",
         "methods_class_extends": "076",
         "methods_function": "076",
-        "methods_param": "254"
+        "methods_param": "254",
+        "timer_s": "202",
+        "timer_ms": "191",
+        "timer_us": "076"
     }
 }
