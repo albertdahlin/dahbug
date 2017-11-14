@@ -269,11 +269,12 @@ class dahbug
     /**
      * Prints a backtrace.
      *
+     * @param boolean $withArrayArgs If arguments of type array should be dumped in backtrace.
      * @static
      * @access public
      * @return void
      */
-    static public function backtrace()
+    static public function backtrace($withArrayArgs = false)
     {
         $backtrace = debug_backtrace();
         $string = DAHBUG_EOL;
@@ -312,6 +313,21 @@ class dahbug
                     $args[] = self::_colorize(
                         $arg,
                         'dump_float'
+                    );
+                } else if (is_array($arg) && $withArrayArgs) {
+                    $args[] = self::_colorize(
+                        self::_formatVar($arg, 0, self::getData('max_depth')),
+                        'dump_array'
+                    );
+                } else if (is_object($arg)) {
+                    $args[] = self::_colorize(
+                        get_class($arg),
+                        'dump_value'
+                    );
+                } else if (is_resource($arg)) {
+                    $args[] = self::_colorize(
+                        'Closures [' . get_resource_type($arg) . ']',
+                        'dump_value'
                     );
                 } else {
                     $args[] = self::_colorize(
