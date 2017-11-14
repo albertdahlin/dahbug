@@ -281,7 +281,8 @@ class dahbug
 
         $root = $_SERVER['DOCUMENT_ROOT'];
         foreach ($backtrace as $row => $data) {
-            $file = substr($data['file'], strlen($root));
+            $file = (isset($data['file'])) ? substr($data['file'], strlen($root)) : 'Unknown';
+
             $args = array();
             foreach ($data['args'] as $arg) {
                 if (is_string($arg)) {
@@ -333,10 +334,10 @@ class dahbug
                 'methods_function'
             );
             $string .= sprintf(
-                '#%d %s:(%d) %s%s%s(%s)',
+                '#%d %s:(%s) %s%s%s(%s)',
                 $row,
                 $file,
-                $data['line'],
+                (isset($data['line'])) ? $data['line'] : 'n/a',
                 $class,
                 isset($data['type']) ? $data['type'] : '',
                 $function,
