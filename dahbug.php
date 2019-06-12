@@ -773,6 +773,7 @@ class dahbug
                             $string .= '  ';
                         }
                         $string .= str_repeat(' ', ($recursion + 1) * self::getData('indent'));
+                        $key = str_replace("\0", ' ', ltrim($key, "\0"));
                         $string .= self::_prepareLabel($key, 'key_property') . ' => ';
                         $string .= self::_formatVar($value, $recursion + 1, $maxDepth);
                     }
