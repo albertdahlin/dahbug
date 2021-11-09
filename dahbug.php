@@ -1029,23 +1029,27 @@ class dahbug
      *
      * @param string $query
      * @param array  $binds
-     * @param string $encoding
+     * @param string $prefix
      * @static
      * @access public
      * @return string
      */
-    static public function writeSql($query, $binds = array(), $encoding = null) {
+    static public function writeSql($query, $binds = array(), $prefix = ':')
+    {
         $keys = array();
 
-        foreach ($binds as $key => $value) {
+        foreach ($binds as $key => &$value) {
             if (is_string($key)) {
-                $keys[] = "/:{$key}/";
+                $key = ltrim($key, $prefix);
+                $keys[] = "/({$prefix}{$key})([\W\s])/";
             } else {
                 $keys[] = '/[?]/';
             }
+
+            $value = "\"{$value}\"$2";
         }
 
-        $query = preg_replace($keys, $binds, $query, 1, $count);
+        $query = preg_replace($keys, $binds, $query, -1, $count);
 
         return self::write($query);
     }
