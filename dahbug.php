@@ -726,7 +726,7 @@ class dahbug
      * @param int $maxLevels    Max recursion depth when printing arrays.
      * @static
      * @access public
-     * @return void
+     * @return mixed
      */
     static public function dump($var, $label = null, $maxDepth = null)
     {
@@ -746,6 +746,54 @@ class dahbug
         self::_write($label . ' = ' . $string);
 
         return $var;
+    }
+
+    /**
+     * Dump static class properties
+     *
+     * @param mixed $class
+     * @param string $label
+     * @param int $maxDepth
+     * @static
+     * @access public
+     * @return void
+     */
+    static public function dumpStatic($class, $label = null, $maxDepth = null)
+    {
+        self::$_backtrace = debug_backtrace();
+
+        if (!is_int($maxDepth)) {
+            $maxDepth = self::getData('max_depth');
+        }
+
+        if (self::getData('print_filename')) {
+            self::_printFilename();
+        }
+
+        if ($label === null) {
+            $label = self::_prepareLabel($class, 'label');;
+        } else {
+            $label = self::_prepareLabel($label, 'label');
+        }
+
+        if (!class_exists($class)) {
+            self::_write($label . " = Class '{$class}' not found");
+
+            return;
+        }
+
+        $reflectionClass = new \ReflectionClass($class);
+        $staticProperties = $reflectionClass->getProperties(\ReflectionProperty::IS_STATIC);
+
+        $string = sprintf('(class:%d) ', count($staticProperties));
+        $string .= self::_colorize($class, 'dump_classname');
+
+        foreach ($staticProperties as $property) {
+            $string .= self::_formatStaticProperty($property, 0, $maxDepth);
+        }
+        $string .= DAHBUG_EOL;
+
+        self::_write($label . ' = ' . $string);
     }
 
     /**
@@ -776,6 +824,12 @@ class dahbug
                         $key = str_replace("\0", ' ', ltrim($key, "\0"));
                         $string .= self::_prepareLabel($key, 'key_property') . ' => ';
                         $string .= self::_formatVar($value, $recursion + 1, $maxDepth);
+                    }
+
+                    $reflectionClass = new \ReflectionClass($var);
+                    $staticProperties = $reflectionClass->getProperties(\ReflectionProperty::IS_STATIC);
+                    foreach ($staticProperties as $property) {
+                        $string .= self::_formatStaticProperty($property, $recursion, $maxDepth);
                     }
                 }
 
@@ -894,6 +948,38 @@ class dahbug
             default:
                 return 'Unknown Type';
         }
+    }
+
+    /**
+     * Formats static property as a string.
+     *
+     * @param ReflectionProperty $property
+     * @param int $recursion
+     * @param int $maxDepth
+     *
+     * @return string
+     */
+    static protected function _formatStaticProperty($property, $recursion = 0, $maxDepth = null)
+    {
+        $string = DAHBUG_EOL;
+        if (self::getData('print_filename')) {
+            $string .= '  ';
+        }
+        $string .= str_repeat(' ', ($recursion + 1) * self::getData('indent'));
+        if ($property->isPrivate()) {
+            $label = $property->class . '::';
+        } elseif ($property->isProtected()) {
+            $label = '*::';
+        } else {
+            $label = '::';
+        }
+
+        $string .= self::_prepareLabel($label . $property->name, 'key_property');
+        $string .= ' => ';
+        $property->setAccessible(true);
+        $string .= self::_formatVar($property->getValue(), $recursion + 1, $maxDepth);
+
+        return $string;
     }
 
     /**
